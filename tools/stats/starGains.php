@@ -2,13 +2,13 @@
 <html>
 	<head>
 		<title>Star Gains</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
+		<div class="smain">
 		
 			<h1>Star Gains</h1>
 			<p><i><b>NOTE:</b> THIS MAY NOT BE 100% ACCURATE, SO DON'T H4CKUSATE JUST BASED OFF OF INFO GIVEN HERE.</i> unless it's just like really obvious</p>
@@ -42,8 +42,8 @@ if (!empty($_GET["id"]))
 		$stars = $user["value"];
 		$time = date("d/m/y H:i:s", $user["timestamp"]);
 		
-		$col = $stars > 750 ? "500000" : "005000";
-		$col = $stars < 0 ? "505000" : $col;
+		$col = $stars > 750 ? "f00000" : "";
+		$col = $stars < 0 ? "f0f000" : $col;
 		
 		echo "<tr style=\"background-color: #$col\"><td>$time</td><td>$stars</td></tr>";
 	}

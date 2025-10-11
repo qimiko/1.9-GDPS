@@ -1,7 +1,10 @@
 <?php
 
 require_once "../incl/lib/auth.php";
-include "../incl/lib/connection.php";	
+include "../incl/lib/connection.php";
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 $errors = array('1' => 'invalid username/password',
 				'2' => 'could not find user',

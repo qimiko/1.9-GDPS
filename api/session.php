@@ -10,7 +10,7 @@ if (!isset($_POST['authkey']) || !is_string($_POST['authkey']))
 
 $result = Auth::make_session($_POST['authkey']);
 
-if (result)
+if ($result)
 {
 	exit(json_encode(['success' => true]));
 }

@@ -1,11 +1,11 @@
 <html>
 	<head>
 		<title>Set Administrator Status</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 	
 		<div class="smain nofooter">
 	
@@ -32,7 +32,7 @@ if (!empty($_POST['u']) AND !empty($_POST['p']) AND !empty($_POST['id']))
 	$generatePass = new generatePass();
 	$pass = $generatePass->isValidUsrname($_POST['u'], $_POST['p']);
 	
-	$q = $db->prepare("SELECT isHeadAdmin FROM accounts WHERE userName = :un AND accountID = 71");
+	$q = $db->prepare("SELECT isHeadAdmin FROM accounts WHERE userName = :un AND (accountID = 71 OR accountID = 47360943)");
 	$q->execute([':un' => $_POST['u']]);
 	$result = $q->fetch()[0];
 

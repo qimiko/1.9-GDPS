@@ -38,12 +38,12 @@ class Auth
 		$authkey = hash('sha256', generateRandomString());
 		
 		//user logged in to too many devices
-		$queryLimit = $db->prepare("SELECT count(*) FROM auth WHERE accountid = :accountid");
-		$queryLimit->execute([':accountid' => $accountid]);
-		if ($queryLimit->fetchColumn() > 16)
-		{
-			return 3;
-		}
+		//$queryLimit = $db->prepare("SELECT count(*) FROM auth WHERE accountid = :accountid");
+		//$queryLimit->execute([':accountid' => $accountid]);
+		//if ($queryLimit->fetchColumn() > 64)
+		//{
+		//	return 3;
+		//}
 		
 		//checking if authkey is a dupe
 		$queryDupe = $db->prepare("SELECT count(*) FROM auth WHERE authkey LIKE :authkey");
@@ -68,7 +68,16 @@ class Auth
 		$query->execute([':authkey' => $key]);
 		return $query->fetchColumn() > 0;
 	}
-	
+
+	public static function check_auth_user($key, $accountId)
+	{
+		include dirname(__FILE__)."/connection.php";
+
+		$query = $db->prepare('SELECT 1 FROM auth WHERE authkey = :authkey AND accountid = :accountid LIMIT 1');
+		$query->execute([':authkey' => $key, ':accountid' => $accountId]);
+                return (bool)$query->fetchColumn();
+	}
+
 	public static function revoke_auth($key)
 	{
 		include dirname(__FILE__)."/connection.php";

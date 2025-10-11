@@ -2,13 +2,14 @@
 <html>
 	<head>
 		<title>Leaderboard UnBan</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
+		<div class="smain">
+			<h1>Leaderboard UnBan</h1>
 <?php
 include "../../incl/lib/connection.php";
 require "../../incl/lib/generatePass.php";

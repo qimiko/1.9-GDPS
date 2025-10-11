@@ -8,53 +8,47 @@ if(file_exists("../logs/fixcpslog.txt")){
 	$newtime = time() - 30;
 	if($cptime > $newtime){
 		$remaintime = time() - $cptime;
-		$remaintime = 30 - $remaintime;
+		$remaintime = 3000 - $remaintime;
 		$remainmins = floor($remaintime / 60);
 		$remainsecs = $remainmins * 60;
 		$remainsecs = $remaintime - $remainsecs;
-		exit("<p>Please wait $remainmins minutes and $remainsecs seconds before running ". basename($_SERVER['SCRIPT_NAME'])." again</p>");
+		exit("<p>Please wait $remainmins minutes and $remainsecs seconds before running cron again</p>");
 	}
 }
 file_put_contents("../logs/fixcpslog.txt",time());
-set_time_limit(0);
+if(function_exists("set_time_limit")) set_time_limit(0);
 $cplog = "";
 $people = array();
 $nocpppl = "";
 include "../../incl/lib/connection.php";
-$query = $db->prepare("SELECT userID, userName FROM users");
-$query->execute();
-$result = $query->fetchAll();
 //getting users
-foreach($result as $user){
-	$userID = $user["userID"];
-	//getting starred lvls count
-	$query2 = $db->prepare("SELECT count(*) FROM levels WHERE userID = :userID AND starStars != 0 AND isCPShared = 0 AND giveNoCP = 0");
-	$query2->execute([':userID' => $userID]);
-	$creatorpoints = $query2->fetchColumn();
-	$cplog .= $user["userName"] . " - " . $creatorpoints . "\r\n";
-	//getting featured lvls count
-	$query3 = $db->prepare("SELECT count(*) FROM levels WHERE userID = :userID AND starFeatured != 0 AND isCPShared = 0 AND giveNoCP = 0");
-	$query3->execute([':userID' => $userID]);
-	$cpgain = $query3->fetchColumn();
-	$creatorpoints = $creatorpoints + $cpgain;
-	$cplog .= $user["userName"] . " - " . $creatorpoints . "\r\n";
-	//getting epic lvls count
-	$query3 = $db->prepare("SELECT count(*) FROM levels WHERE userID = :userID AND starEpic != 0 AND isCPShared = 0 AND giveNoCP = 0");
-	$query3->execute([':userID' => $userID]);
-	$cpgain = $query3->fetchColumn();
-	$creatorpoints = $creatorpoints + $cpgain + $cpgain;
-	$cplog .= $user["userName"] . " - " . $creatorpoints . "\r\n";
-	//inserting cp value
-	if($creatorpoints != 0){
-		$people[$userID] = $creatorpoints;
-	}else{
-		$nocpppl .= $userID.",";
-	}
-}
+$query = $db->prepare("UPDATE users
+	LEFT JOIN
+	(
+	    SELECT usersTable.userID, (IFNULL(starredTable.starred, 0) + IFNULL(featuredTable.featured, 0) + (IFNULL(epicTable.epic,0)*2)) as CP FROM (
+            SELECT userID FROM users
+        ) AS usersTable
+        LEFT JOIN
+        (
+	        SELECT count(*) as starred, userID FROM levels WHERE starStars != 0 AND isCPShared = 0 AND giveNoCP = 0 GROUP BY(userID)
+	    ) AS starredTable ON usersTable.userID = starredTable.userID
+	    LEFT JOIN
+	    (
+	        SELECT count(*) as featured, userID FROM levels WHERE starFeatured != 0 AND isCPShared = 0 AND giveNoCP = 0 GROUP BY(userID)
+	    ) AS featuredTable ON usersTable.userID = featuredTable.userID
+	    LEFT JOIN
+	    (
+	        SELECT count(*) as epic, userID FROM levels WHERE starEpic != 0 AND isCPShared = 0 AND giveNoCP = 0 GROUP BY(userID)
+	    ) AS epicTable ON usersTable.userID = epicTable.userID
+	) calculated
+	ON users.userID = calculated.userID
+	SET users.creatorPoints = IFNULL(calculated.CP, 0)");
+$query->execute();
+echo "Calculated base creator points<br>";
 /*
 	CP SHARING
 */
-$query = $db->prepare("SELECT levelID, userID, starStars, starFeatured, starEpic FROM levels WHERE isCPShared = 1 AND giveNoCP = 0");
+$query = $db->prepare("SELECT levelID, userID, starStars, starFeatured, starEpic, giveNoCP FROM levels WHERE isCPShared = 1 ");//AND giveNoCP = 0");
 $query->execute();
 $result = $query->fetchAll();
 foreach($result as $level){
@@ -75,8 +69,12 @@ foreach($result as $level){
 	$shares = $query->fetchAll();
 	foreach($shares as &$share){
 		$people[$share["userID"]] += $addcp;
+                echo "Gave {$share['userID']} $addcp creator points from {$level['levelID']} (shared) <br />";
 	}
-	$people[$level["userID"]] += $addcp;
+	if ($level["giveNoCP"] == 0) //nocp + sharecp = transfercp
+	{
+		$people[$level["userID"]] += $addcp;
+	}
 }
 /*
 	NOW to update GAUNTLETS CP
@@ -95,6 +93,7 @@ foreach($result as $gauntlet){
 		if($result["userID"] != ""){
 			$cplog .= $result["userID"] . " - +1\r\n";
 			$people[$result["userID"]] += 1;
+                        echo "Gave {$result['userID']} 1 creator point (gauntlet)";
 		}
 	}
 }
@@ -114,35 +113,18 @@ foreach($result as $daily){
 	if($result["userID"] != ""){
 		$people[$result["userID"]] += 1;
 		$cplog .= $result["userID"] . " - +1\r\n";
+                echo "Gave ${result['userID']} 1 creator point (daily)";
 	}
 }
 /*
 	DONE
 */
-$nocpppl = substr($nocpppl, 0, -1);
-$query4 = $db->prepare("UPDATE users SET creatorPoints = 0 WHERE userID IN ($nocpppl)");
-$query4->execute();
-echo "<p>Reset CP of ".(string)(substr_count($nocpppl, ',')+1)." accounts</p>";
-echo "<table><tr><th>UserID</th><th>Creator Points</th></tr>";
 foreach($people as $user => $cp){
-	echo "<tr><td>$user</td><td>$cp</td></tr>";
-	ob_flush();
-	flush();
-	$query4 = $db->prepare("UPDATE users SET creatorPoints = :creatorpoints WHERE userID=:userID");
+	echo "$user now has $cp additional creator points... <br>";
+	$query4 = $db->prepare("UPDATE users SET creatorPoints = (creatorpoints + :creatorpoints) WHERE userID=:userID");
 	$query4->execute([':userID' => $user, ':creatorpoints' => $cp]);
 }
-echo "</table>";
-//april fools
-$date = date("d-m");
-if($date == "01-04"){
-	//IN WHAT FUCKING WORLD WAS THIS A GOOD IDEA
-	//$query4 = $db->prepare("UPDATE users SET creatorPoints='99999', userName='sakujes', stars='999', secret='april'");
-	//$query4->execute();
-}else{
-	//$query4 = $db->prepare("UPDATE users SET gameVersion='0', stars='0' WHERE secret='april'");
-	//$query4->execute();
-	//$query4 = $db->prepare("UPDATE users SET creatorPoints='0' WHERE creatorPoints='99999'");
-	//$query4->execute();
-}
+echo "<hr>done";
+
 file_put_contents("../logs/cplog.txt",$cplog);
 ?>

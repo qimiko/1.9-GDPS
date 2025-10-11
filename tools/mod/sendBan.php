@@ -2,13 +2,14 @@
 <html>
 <head>
 <title>Send Ban</title>
-<?php include "../../../../incl/style.php"; ?>
+<?php include "../../../../incl/_style.php"; ?>
 </head>
 
 <body>
-<?php include "../../../../incl/navigation.php"; ?>
+<?php include "../../../../incl/_nav.php"; ?>
 
-<div class="smain nofooter">
+<div class="smain">
+	<h1>Send Levels Ban</h1>
 <?php
     include "../../incl/lib/connection.php";
     require "../../incl/lib/generatePass.php";
@@ -46,7 +47,7 @@
                 }
             }
         }else{
-            echo "<p>Invalid password or nonexistant account</p><a href='sendBan.php'>Try again</a>";
+            echo "<p>Invalid password or nonexistant account</p><a href=''>Try again</a>";
         }
     }else{
         echo '<form action="" method="post">

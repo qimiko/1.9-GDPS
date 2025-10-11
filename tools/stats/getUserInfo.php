@@ -2,15 +2,15 @@
 <html>
 	<head>
 		<title>Get User Info</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
+		<div class="smain">
 	
-			<h1>Get User Info</h1>
+			<h1>Search Users</h1>
 			<form action="" method="get">
 				<input class="smain" type="text" placeholder="Username" name="u"><br>
 				<input class="smain" type="submit" value="Go">
@@ -26,13 +26,13 @@ if (!empty($_GET['u']))
 		exit("<p>Username must be at least 2 characters</p>");
 	}
 	
-	$query = $db->prepare("SELECT * FROM users WHERE userName LIKE CONCAT('%', :uName, '%')");
+	$query = $db->prepare("SELECT * FROM users WHERE userName LIKE CONCAT('%', :uName, '%') OR extID IN (SELECT accountID FROM accounts WHERE userName LIKE CONCAT('%', :uName, '%'))");
 	$query->execute([':uName' => $_GET['u']]);
 	$users = $query->fetchAll();
 
 	$c = count($users);
 	echo "<p>Count: $c</p>";
-	echo '<table><tr><th>UserName</th><th>UserID</th><th>Stars</th><th>Is Banned</th><th>Ban Reason</th><th>AccountID</th><th>Register Date</th></tr>';
+	echo '<table><tr><th>UserName</th><th>UserID</th><th>Stars</th><th>Comment Banned</th><th>Is Banned</th><th>Ban Reason</th><th>AccountID</th><th>Register Date</th></tr>';
 	$idx = 0;
 	foreach ($users as &$user)
 	{
@@ -40,6 +40,7 @@ if (!empty($_GET['u']))
 		$id = $user['userID'];
 		$st = $user['stars'];
 		$ib = $user['isBanned'];
+		$cb = $user['isCommentBanned'];
 		$reason = $user['banReason'];
 		$time = "";//date("d/m/y H:i:s", $user['registerDate']);
 
@@ -60,12 +61,12 @@ if (!empty($_GET['u']))
 		}
 		
 
-		$col = $ac == "" ? "505000" : 0 /*"005000"*/;
-		$col = $ib != 0 ? "500000" : $col;
+		$col = ($ac == "") || ($cb != "0") ? "f0f000" : 0 /*"005000"*/;
+		$col = $ib != 0 ? "f00000" : $col;
 		
 		echo $col ? "\t\t\t\t<tr style=\"background-color: #$col\">" : "\t\t\t\t<tr>";
 		
-		echo "<td>$un</td><td>$id</td><td>$st</td><td>$ib</td><td>$reason</td><td>$ac</td><td>$time</td></tr>\n";
+		echo "<td>$un</td><td>$id</td><td>$st</td><td>$cb</td><td>$ib</td><td>$reason</td><td>$ac</td><td>$time</td></tr>\n";
 		
 		$idx++;
 	}

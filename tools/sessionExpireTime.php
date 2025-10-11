@@ -3,7 +3,7 @@
 
 <?php
 require_once "../incl/lib/sessions.php";
-include "../incl/lib/connection.php";		
+include "../incl/lib/connection.php";
 
 if (array_key_exists('u', $_GET))
 {

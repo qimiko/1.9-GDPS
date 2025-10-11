@@ -2,15 +2,15 @@
 <html>
 	<head>
 		<title>Server Info</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
-
-			<h1>Levels</h1>
+		<div class="smain">
+			<h1>Server Info</h1>
+			<h2>Levels</h2>
 			<table>
 				<tr><th>Difficulty</th><th>Total</th><th>Unrated</th><th>Rated</th><th>Featured</th><th>Epic</th></tr>
 <?php
@@ -48,7 +48,7 @@ echo genLvlRow("AND","starDemon = 1", "Demon", "WHERE");
 
 ?>
 			</table>
-			<h1>Accounts</h1>
+			<h2>Accounts</h2>
 			<table>
 				<tr><th>Type</th><th>Count</th></tr>
 <?php
@@ -68,21 +68,25 @@ $query->execute();
 $thing = $query->fetchColumn();
 echo "<tr><td>Total Actions</td><td>$thing</td></tr>";
 
+
+
 $qt = time() - 2592000;
-$query = $db->prepare("SELECT count(*) FROM actions WHERE ID IN (SELECT MIN(ID) FROM actions GROUP BY value2) AND timestamp > :lastPlayed AND value2 IS NOT NULL");
+//$query = $db->prepare("SELECT count(*) FROM actions WHERE ID IN (SELECT MIN(ID) FROM actions GROUP BY value2) AND timestamp > :lastPlayed AND value2 IS NOT NULL");
+$query = $db->prepare("SELECT count(*) FROM users WHERE lastPlayed > :lastPlayed");
 $query->execute([':lastPlayed' => $qt]);
 $thing = $query->fetchColumn();
 echo "<tr><td>Active this Month</td><td>$thing</td></tr>";
 
 $qt = time() - 604800;
-$query = $db->prepare("SELECT count(*) FROM actions WHERE ID IN (SELECT MIN(ID) FROM actions GROUP BY value2) AND timestamp > :lastPlayed AND value2 IS NOT NULL");
+//$query = $db->prepare("SELECT count(*) FROM actions WHERE ID IN (SELECT MIN(ID) FROM actions GROUP BY value2) AND timestamp > :lastPlayed AND value2 IS NOT NULL");
+$query = $db->prepare("SELECT count(*) FROM users WHERE lastPlayed > :lastPlayed");
 $query->execute([':lastPlayed' => $qt]);
 $thing = $query->fetchColumn();
 echo "<tr><td>Active this Week</td><td>$thing</td></tr>";
 
 ?>
 			</table>
-			<h1>Comments</h1>
+			<h2>Comments</h2>
 			<table>
 				<tr><th>From</th><th>Count</th></tr>
 <?php
@@ -99,7 +103,7 @@ echo "<tr><td>Moderators</td><td>$thing</td></tr>";
 
 ?>
 			</table>
-			<h1>Leaderboards</h1>
+			<h2>Leaderboards</h2>
 			<table>
 				<tr><th>Stat</th><th>Count</th></tr>
 <?php

@@ -3,7 +3,7 @@
 include dirname(__FILE__)."/../../config/connection.php";
 @header('Content-Type: text/html; charset=utf-8');
 try {
-    $db = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password, array(
+    $db = new PDO("mysql:dbname=$dbname", $username, $password, array(
     PDO::ATTR_PERSISTENT => true
 ));
     // set the PDO error mode to exception

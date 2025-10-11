@@ -1,12 +1,25 @@
-<html><head><title>MOD</title></head><body><h1>ADMIN: SET MOD</h1>
+<html>
+	<head>
+		<title>Set Moderator Status</title>
+		<?php include "../../../../incl/_style.php"; ?>
+	</head>
+	
+	<body>
+		<?php include "../../../../incl/_nav.php"; ?>
+	
+		<div class="smain">
+	
+			<h1>Set Moderator Status</h1>
 
-<form action="mod.php" method="post">
-Username: <input type="text" name="u"><br>
-Password: <input type="password" name="p"><br>
-AccountID (NOT UserID): <input type="text" name="id"> <a href="../stats/getUserInfo.php" target="_blank">Get AccountID</a><br>
-Set Mod: <input type="text" name="mod" value="1"> 0 = Remove Mod, 1 = Give Mod<br>
-<input type="submit" value="Go">
-</form>
+			<a href="../stats/getUserInfo.php" target="_blank">Get AccountID</a>
+
+			<form action="" method="post">
+				<input class="smain" type="text" placeholder="Username" name="u"><br>
+				<input class="smain" type="password" placeholder="Password" name="p"><br>
+				<input class="smain" type="text" placeholder="AccountID" name="id"><br>
+				<input class="smain" type="text" placeholder="Set Mod (0 = remove, 1 = give)" name="mod" value="1"><br>
+				<input class="smain" type="submit" value="Go">
+			</form>
 
 <?php
 
@@ -62,4 +75,7 @@ else
 	echo "MISSING FIELDS.";
 }
 
-?></body></html>
+?>
+		</div>
+	</body>
+</html>

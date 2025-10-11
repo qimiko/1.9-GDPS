@@ -2,14 +2,15 @@
 <html>
 	<head>
 		<title>Comments</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
-			<h1>Usage</h1>
+		<div class="smain">
+			<h1>Comments</h1>
+			<h2>Usage</h2>
 			<p>Seperate UserIDs and words by spaces, put phrases in quotes</p>
 			<p>If you want to exclude a userid/word/phrase, put a `-` before it.</p>
 			<p>Words & phrases need to be at least 2 characters and less than 32.</p>

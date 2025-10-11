@@ -2,14 +2,14 @@
 <html>
 	<head>
 		<title>Top 24h</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
-			<h1>TOP LEADERBOARD PROGRESS</h1>
+		<div class="smain">
+			<h1>TOP LEADERBOARD PROGRESS (24h)</h1>
 			
 			<table><tr><th>#</th><th>UserID</th><th>UserName</th><th>Stars</th></tr>
 <?php

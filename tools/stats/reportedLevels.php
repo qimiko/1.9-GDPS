@@ -2,13 +2,14 @@
 <html>
 	<head>
 		<title>Reported Levels</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
 		<div class="smain nofooter">
+			<h1>Reported Levels</h1>
 			<table><tr><th>LevelID</th><th>Reported</th></tr>
 <?php
 //error_reporting(0);

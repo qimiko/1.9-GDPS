@@ -4,3 +4,5 @@ RewriteRule ^login/?$ login.php
 RewriteRule ^logout/?$ logout.php
 RewriteRule ^register/?$ register.php
 RewriteRule ^session/?$ session.php
+RewriteRule ^news/?$ news.php
+RewriteRule ^redirect/?$ redirect.php

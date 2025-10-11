@@ -27,7 +27,7 @@ if(!empty($_POST["accountID"]) AND $_POST["accountID"]!="0"){
 	$register = 1;
 	$GJPCheck = new GJPCheck();
 	$gjpresult = $GJPCheck->check($gjp,$id);
-	if($gjpresult == 0){
+	if($gjpresult != 1){
 		exit("-1");
 	}
 	
@@ -54,6 +54,13 @@ $comment = base64_encode($comment);
 $userID = $mainLib->getUserID($id, $userName);
 $uploadDate = time();
 $decodecomment = base64_decode($comment);
+
+$bquery = $db->prepare("SELECT * FROM users WHERE userID = :id AND isCommentBanned <> 0");
+$bquery->execute([':id' => $userID]);
+if ($bquery->rowCount() > 0)
+{
+	exit("-1");
+}
 
 if($id != "" AND $comment != ""){
 

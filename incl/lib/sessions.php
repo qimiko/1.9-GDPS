@@ -61,7 +61,7 @@ class accSession
 		include dirname(__FILE__)."/connection.php";
 		
 		$sessionEnd = time() - 604800;
-
+		
 		$query = $db->prepare("SELECT accountID FROM accSessions WHERE accountID = :accID AND ip = :IP AND sessionStart > :timestamp");
 		$query->execute([':accID' => $accID, ':IP' => $_SERVER["REMOTE_ADDR"], ':timestamp' => $sessionEnd]);
 		if ($query->rowCount() > 0) { //if session exists

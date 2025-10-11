@@ -11,11 +11,6 @@ if(empty($_POST["songID"])){
 $songid = $ep->remove($_POST["songID"]);
 $realid = $songid;
 
-if ($realid >= 990000 AND $realid < 1000000)
-{
-	$realid += 4115655;
-}
-
 $query3=$db->prepare("SELECT ID,name,authorID,authorName,size,isDisabled,download FROM songs WHERE ID = :songid LIMIT 1");
 $query3->execute([':songid' => $realid]);
 if($query3->rowCount() == 0) {
@@ -55,6 +50,7 @@ if($query3->rowCount() == 0) {
 		);
 
 		$ch = curl_init($url);
+		curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 		$result = curl_exec($ch);
@@ -63,7 +59,7 @@ if($query3->rowCount() == 0) {
 			$result = explode('#',$result)[2];
 		}else{
 			$ch = curl_init(); 
-			curl_setopt($ch, CURLOPT_URL, "http://www.newgrounds.com/audio/listen/".$songid); 
+			curl_setopt($ch, CURLOPT_URL, "https://www.newgrounds.com/audio/listen/".$songid); 
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
 			$songinfo = curl_exec($ch); 
 			curl_close($ch);

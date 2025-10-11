@@ -1,6 +1,5 @@
 <?php
 chdir(dirname(__FILE__));
-error_reporting(0);
 include "../lib/connection.php";
 require_once "../lib/exploitPatch.php";
 $ep = new exploitPatch();
@@ -8,7 +7,7 @@ $accountID = $ep->remove($_POST["accountID"]);
 $type = $ep->remove($_POST["type"]);
 $query = "SELECT * FROM users WHERE isCreatorBanned = '0' AND creatorPoints > 0 ORDER BY creatorPoints DESC";
 $query = $db->prepare($query);
-$query->execute([':stars' => $stars, ':count' => $count]);
+$query->execute();
 $result = $query->fetchAll();
 foreach($result as &$user){
 	if(is_numeric($user["extID"])){

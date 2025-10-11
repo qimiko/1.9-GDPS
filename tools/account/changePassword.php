@@ -1,3 +1,15 @@
+<html>
+        <head>
+                <title>Change Password - 1.9 GDPS</title>
+                <?php include "../../../../incl/_style.php"; ?>
+        </head>
+
+        <body>
+                <?php include "../../../../incl/_nav.php"; ?>
+
+                <div class="smain">
+                        <h1>Change Password</h1>
+
 <?php
 include "../../incl/lib/connection.php";
 include_once "../../config/security.php";
@@ -39,14 +51,20 @@ if ($pass == 1) {
 	}
 	//creating pass hash
 	$passhash = password_hash($newpass, PASSWORD_DEFAULT);
-	$query = $db->prepare("UPDATE accounts SET password=:password, salt=:salt WHERE userName=:userName");	
-	$query->execute([':password' => $passhash, ':userName' => $userName, ':salt' => $salt]);
-	echo "Password changed. <a href='accountManagement.php'>Go back to account management</a>";
+	$query = $db->prepare("UPDATE accounts SET password=:password WHERE userName=:userName");	
+	$query->execute([':password' => $passhash, ':userName' => $userName]);
+
+	$clearQuery = $db->prepare("DELETE auth FROM auth INNER JOIN accounts ON auth.accountid=accounts.accountID WHERE accounts.userName=:userName");
+	$clearQuery->execute([':userName' => $userName]);
+	echo "<p class='nobox'>Password changed. <br /> <a href='accountManagement.php'>Go back to account management</a> </p>";
 }else{
-	echo "Invalid old password or nonexistent account. <a href='changePassword.php'>Try again</a>";
+	echo "Invalid old password or nonexistent account. <br /> <a href=''>Try again</a>";
 
 }
 }else{
-	echo '<form action="changePassword.php" method="post">Username: <input type="text" name="userName"><br>Old password: <input type="password" name="oldpassword"><br>New password: <input type="password" name="newpassword"><br><input type="submit" value="Change"></form>';
+	echo '<form action="" method="post">Username: <input type="text" name="userName"><br>Old password: <input type="password" name="oldpassword"><br>New password: <input type="password" name="newpassword"><br><input type="submit" value="Change"></form>';
 }
 ?>
+		</div>
+	</body>
+</html>

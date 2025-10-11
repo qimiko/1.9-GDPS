@@ -1,7 +1,7 @@
 <?php
 
 chdir(dirname(__FILE__));
-//error_reporting(0);
+
 include "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
@@ -100,12 +100,12 @@ if(!empty($_POST["diamonds"])){
 //continuing the accounts system
 $accountID = "";
 if(empty($_POST["udid"]) AND empty($_POST["accountID"])){
-	exit("1");
+	exit("-1");
 }
 if(!empty($_POST["udid"])){
 	$id = $ep->remove($_POST["udid"]);
 	if(is_numeric($id)){
-		exit("1");
+		exit("-1");
 	}
 }
 if(!empty($_POST["accountID"]) AND $_POST["accountID"]!="0"){
@@ -114,7 +114,7 @@ if(!empty($_POST["accountID"]) AND $_POST["accountID"]!="0"){
 	$GJPCheck = new GJPCheck(); //gjp check
 	$gjpresult = $GJPCheck->check($gjp,$id);
 	if($gjpresult != 1){
-		exit("1");
+		exit("-1");
 	}
 }else{
 	$register = 0;

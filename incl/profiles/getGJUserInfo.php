@@ -1,4 +1,7 @@
 <?php
+
+exit("-1");
+
 chdir(dirname(__FILE__));
 include "../lib/connection.php";
 require_once "../lib/exploitPatch.php";

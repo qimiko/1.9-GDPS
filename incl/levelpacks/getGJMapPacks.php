@@ -32,8 +32,10 @@ foreach($result as &$mappack) {
 		$colors2 = $mappack["rgbcolors"];
 	}
 	
+	//$mappackstring .= "1:".$mappack["ID"].":3:".$mappack["levels"].":4:".$mappack["stars"].":5:".$mappack["coins"]."|";
+	
 	if ($isVerify)
-		$mappackstring .= "1:".$mappack["ID"].":3:".$mappack["levels"].":4:".$mappack["stars"].":5:".$mappack["coins"]."|";
+		$mappackstring .= "1:".$mappack["ID"].":2:".$mappack["name"].":3:".$mappack["levels"].":4:".$mappack["stars"].":5:".$mappack["coins"].":6:".$mappack["difficulty"].":7:".$mappack["rgbcolors"].":8:".$colors2."|";
 	else
 		$mappackstring .= "1:".$mappack["ID"].":2:".$mappack["name"].":3:".$mappack["levels"].":4:".$mappack["stars"].":5:".$mappack["coins"].":6:".$mappack["difficulty"].":7:".$mappack["rgbcolors"].":8:".$colors2."|";
 }

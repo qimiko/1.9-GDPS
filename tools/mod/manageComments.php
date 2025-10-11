@@ -2,13 +2,14 @@
 <html>
 	<head>
 		<title>Manage Comments</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
+		<div class="smain">
+			<h1>Manage Comments</h1>
 
 			<form action="" method="get">
 				<input class="smain" type="text" placeholder="LevelID" name="id"><br>
@@ -26,7 +27,7 @@ if (!empty($_GET['id']))
 	$query->execute([':levelid' => (int)($_GET['id'])]);
 	
 	
-	echo "<form action=\"\" method=\"post\"><table><tr><th>Hidden</th><th>Username</th><th>UserID</th><th>Comment</th><th>CommentID</th></tr>";
+	echo "<hr /><form action=\"\" method=\"post\"><table><tr><th>Hidden</th><th>Username</th><th>UserID</th><th>Comment</th><th>CommentID</th></tr>";
 	
 	$results = $query->fetchAll();
 	

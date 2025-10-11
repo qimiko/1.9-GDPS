@@ -1,7 +1,7 @@
 <?php
 
 chdir(dirname(__FILE__));
-//error_reporting(0);
+
 include "../lib/connection.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/GJPCheck.php";
@@ -35,7 +35,7 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 {
 	if($type == "top")
 	{
-		$query = "SELECT * FROM users WHERE isBanned = '0' AND stars > 0 ORDER BY stars DESC LIMIT 100";
+		$query = "SELECT * FROM users WHERE isBanned = '0' AND stars > 0 AND isRegistered = '1' ORDER BY stars DESC LIMIT 100";
 	}
 	if($type == "creators")
 	{
@@ -48,7 +48,7 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 		$query->execute([':accountID' => $accountID]);
 		$result = $query->fetchAll();
 		$user = $result[0];
-		$stars = $user["stars"];
+		$stars = (int)$user["stars"];
 		if($_POST["count"]){
 			$count = $ep->remove($_POST["count"]);
 		}else{
@@ -58,16 +58,18 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 		$query = "SELECT	A.* FROM	(
 			(
 				SELECT	*	FROM users
-				WHERE stars <= :stars
+				WHERE stars <= $stars
 				AND isBanned = 0
+				AND isRegistered = 1
 				ORDER BY stars DESC
 				LIMIT $count
 			)
 			UNION
 			(
 				SELECT * FROM users
-				WHERE stars >= :stars
+				WHERE stars >= $stars
 				AND isBanned = 0
+				AND isRegistered = 1
 				ORDER BY stars ASC
 				LIMIT $count
 			)
@@ -75,7 +77,7 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 		ORDER BY A.stars DESC";
 	}
 	$query = $db->prepare($query);
-	$query->execute([':stars' => $stars, ':count' => $count]);
+	$query->execute();
 	$result = $query->fetchAll();
 	if($type == "relative"){
 		$user = $result[0];
@@ -85,7 +87,7 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 		$query->execute();
 		$f = "SELECT rank, stars FROM (
 							SELECT @rownum := @rownum + 1 AS rank, stars, extID, isBanned
-							FROM users WHERE isBanned = '0' ORDER BY stars DESC
+							FROM users WHERE isBanned = '0' AND isRegistered = '1' ORDER BY stars DESC
 							) as result WHERE extID=:extid";
 		$query = $db->prepare($f);
 		$query->execute([':extid' => $extid]);
@@ -101,7 +103,7 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 		}
 		$xi++;
 		
-		$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["stars"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"]."|";
+		$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["stars"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"].":52:0|";
 		
 	}
 }
@@ -135,7 +137,7 @@ if($type == "week")
 		$query = $db->prepare("SELECT * FROM users WHERE userID = :userID");
 		$query->execute([':userID' => $userID]);
 		$user = $query->fetchAll()[0];
-		if($user["isBanned"] == 0)
+		if($user["isBanned"] == 0 && $user["isRegistered"] == 1)
 		{
 			$xi++;
 			$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":4:-1:13:-1:17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$stars.":7:".$user["extID"]."|";

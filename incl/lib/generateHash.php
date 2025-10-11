@@ -2,6 +2,7 @@
 //credits to pavlukivan for decoding and to IAD for most of genSolo
 class generateHash {
 	public function genMulti($lvlsmultistring) {
+		return "";
 		$lvlsarray = explode(",", $lvlsmultistring);
 		include dirname(__FILE__)."/connection.php";
 		$hash = "";
@@ -21,7 +22,8 @@ class generateHash {
 				$query->execute([':levelID' => $id]);
 			}
 			//generating the hash
-			$hash = $hash . $result["levelID"][0].$result["levelID"][strlen($result["levelID"])-1].$result["starStars"].$result["starCoins"];
+			$str_levelid = (string)$result["levelID"];
+			$hash .= $str_levelid[0].$str_levelid[strlen($str_levelid)-1].$result["starStars"].$result["starCoins"];
 		}
 		return sha1($hash . "xI25fpAapCQg");
 	}

@@ -1,13 +1,14 @@
 <html>
 	<head>
 		<title>Level To GD</title>
-		<?php include "../../../incl/style.php"; ?>
+		<?php include "../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../incl/navigation.php"; ?>
+		<?php include "../../../incl/_nav.php"; ?>
 		
 		<div class="smain">
+			<h1>Level To GD</h1>
 <?php
 function chkarray($source){
 	if($source == ""){
@@ -105,10 +106,8 @@ if(!empty($_POST["userhere"]) AND !empty($_POST["passhere"]) AND !empty($_POST["
 	'levelString' => $levelString,
 	'levelInfo' => $levelInfo["levelInfo"],
 	'secret' => "Wmfd2893gb7"];
-	if($_POST["debug"] == 1){
-		var_dump($post);
-	}
 	$ch = curl_init($server . "/uploadGJLevel21.php");
+	curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 	$result = curl_exec($ch);
@@ -127,21 +126,22 @@ if(!empty($_POST["userhere"]) AND !empty($_POST["passhere"]) AND !empty($_POST["
 }else{
 	echo '<form action="" method="post">
 			<p><b>Your password for the target server is NOT saved, it\'s used for one-time verification purposes only.</b></p>
-			<h3>1.9 GDPS</h3>
+			<h2>1.9 GDPS</h2>
 			<input class="smain" type="text" placeholder="Username" name="userhere"><br>
 			<input class="smain" type="password" placeholder="Password" name="passhere"><br>
 			<input class="smain" type="text" placeholder="LevelID" name="levelID"><br>
-			<h3>Target server</h3>
+			<h2>Target server</h2>
 			<input class="smain" class="smain" type="text" placeholder="Username" name="usertarg"><br>
 			<input class="smain" type="password" placeholder="Password" name="passtarg"><br>
 			<input class="smain" type="text" placeholder="URL" name="server" value="http://www.boomlings.com/database/"><br>
 			<input class="smain" type="text" placeholder="Debug Mode" name="debug" value="0"><br>
+			<hr />
 			<input class="smain" type="submit" value="Reupload">
 		</form>
+			<hr />
 			<p>Alternative servers to reupload to:</p>
 			<p>http://www.boomlings.com/database/ - Robtops server</p>
-			<p>http://pi.michaelbrabec.cz:9010/a/ - CvoltonGDPS</p>
-			<p>http://gdu.cloud/_______/database/ - GD Ultimate</p>';
+			<p>http://pi.michaelbrabec.cz:9010/a/ - CvoltonGDPS</p>';
 }
 ?>
 		</div>

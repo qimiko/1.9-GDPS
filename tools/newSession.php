@@ -1,14 +1,15 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>New Session</title>
-		<?php include "../../../incl/style.php"; ?>
+		<title>Check Session</title>
+		<?php include "../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../incl/navigation.php"; ?>
+		<?php include "../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
+		<div class="smain">
+			<h1>New Session</h1>
 <?php
 require_once "../incl/lib/sessions.php";
 include "../incl/lib/connection.php";		

@@ -6,7 +6,8 @@ $ep = new exploitPatch();
 //here im getting all the data
 $userName = $ep->remove($_POST["userName"]);
 $newusr = $ep->remove($_POST["newusr"]);
-$password = $ep->remove($_POST["password"]);
+$password = $_POST["password"];
+
 if($userName != "" AND $newusr != "" AND $password != ""){
 	$generatePass = new generatePass();
 	$pass = $generatePass->isValidUsrname($userName, $password);
@@ -14,14 +15,14 @@ if($userName != "" AND $newusr != "" AND $password != ""){
 		$query = $db->prepare("UPDATE accounts SET username=:newusr WHERE userName=:userName");	
 		$query->execute([':newusr' => $newusr, ':userName' => $userName]);
 		if($query->rowCount()==0){
-			echo "Invalid password or nonexistant account. <a href='changeUsername.php'>Try again</a>";
+			echo "Invalid password or nonexistant account. <a href=''>Try again</a>";
 		}else{
 			echo "Username changed. <a href='accountManagement.php'>Go back to account management</a>";
 		}
 	}else{
-		echo "Invalid password or nonexistant account. <a href='changeUsername.php'>Try again</a>";
+		echo "Invalid password or nonexistant account. <a href=''>Try again</a>";
 	}
 }else{
-	echo '<form action="changeUsername.php" method="post">Old username: <input type="text" name="userName"><br>New username: <input type="text" name="newusr"><br>Password: <input type="password" name="password"><br><input type="submit" value="Change"></form>';
+	echo '<form action="" method="post">Old username: <input type="text" name="userName"><br>New username: <input type="text" name="newusr"><br>Password: <input type="password" name="password"><br><input type="submit" value="Change"></form>';
 }
 ?>

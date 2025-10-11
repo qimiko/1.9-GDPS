@@ -2,13 +2,14 @@
 <html>
 	<head>
 		<title>Mod Actions</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
+		<div class="smain">
+			<h1>Mod Actions</h1>
 <?php
 
 include "../../incl/lib/connection.php";
@@ -79,7 +80,7 @@ foreach ($result2 as $account)
 	}
 }
 
-echo '<h1>Admins</h1><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
+echo '<h2>Admins</h2><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
 
 foreach ($currentMods as $mod)
 {
@@ -89,7 +90,7 @@ foreach ($currentMods as $mod)
 	}
 }
 
-echo '</table><h1>Moderators</h1><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
+echo '</table><h2>Moderators</h2><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
 
 foreach ($currentMods as $mod)
 {
@@ -99,7 +100,9 @@ foreach ($currentMods as $mod)
 	}
 }
 
-echo '</table><h1>Ex-Moderators</h1><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
+echo '</table><h2>Ex-Moderators</h2><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
+
+usort($exMods, function($a, $b) {return $b['rateCount'] - $a['rateCount'];});
 
 foreach ($exMods as $mod)
 {
@@ -109,7 +112,7 @@ foreach ($exMods as $mod)
 	}
 }
 
-echo '</table><h1>Actions</h1><table><tr><th>Username</th><th>Type</th><th>LevelID</th><th>Value</th><th>Value2</th><th>Time</th></tr>';
+echo '</table><h2>Actions</h2><table><tr><th>Username</th><th>Type</th><th>LevelID</th><th>Value</th><th>Value2</th><th>Time</th></tr>';
 
 foreach ($result as $action)
 {

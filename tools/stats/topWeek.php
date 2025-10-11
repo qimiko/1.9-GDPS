@@ -2,14 +2,14 @@
 <html>
 	<head>
 		<title>Top Week</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
-			<h1>Top Leaderboard Progress</h1>
+		<div class="smain">
+			<h1>Top Leaderboard Progress (Week)</h1>
 			
 			<table><tr><th>#</th><th>UserID</th><th>UserName</th><th>Stars</th></tr>
 <?php

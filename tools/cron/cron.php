@@ -2,15 +2,17 @@
 <html>
 	<head>
 		<title>Cron Job</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
-		<div class="smain nofooter">
+		<div class="smain">
+			<h1>Cron Job</h1>
 
 <?php
+
 chdir(dirname(__FILE__));
 set_time_limit(0);
 include "fixcps.php";

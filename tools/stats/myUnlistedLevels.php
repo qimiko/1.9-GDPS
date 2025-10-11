@@ -2,13 +2,14 @@
 <html>
 	<head>
 		<title>Unlisted Levels</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
 		<div class="smain">
+			<h1>Unlisted Levels</h1>
 <?php
 include "../../incl/lib/connection.php";
 require "../../incl/lib/generatePass.php";

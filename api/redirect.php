@@ -2,7 +2,7 @@
 
 if ($_SERVER['QUERY_STRING'] == "demonList")
 {
-	header("Location: https://gdpslist.weebly.com/demons-list.html");
+	header("Location: https://pointercrate.xyze.dev/");
 }
 else if ($_SERVER['QUERY_STRING'] == "tools")
 {
@@ -15,6 +15,14 @@ else if ($_SERVER['QUERY_STRING'] == "changeUsername")
 else if ($_SERVER['QUERY_STRING'] == "changePassword")
 {
 	header("Location: https://nettik.co.uk/gdps/database/tools/change-password");
+}
+else if ($_SERVER['QUERY_STRING'] == 'twitter')
+{
+	header("Location: https://twitter.com/official19gdps");
+}
+else if ($_SERVER['QUERY_STRING'] == 'youtube')
+{
+	header("Location: https://www.youtube.com/channel/UCIUpOcn9GZ-IlEw34czouIg");
 }
 else
 {

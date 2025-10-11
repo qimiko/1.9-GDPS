@@ -1,14 +1,15 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>New Session</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<title>Map Packs</title>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
 		<div class="smain nofooter">
+			<h1>Unlisted Levels</h1>
 			<table><tr><th>#</th><th>Map Pack</th><th>Stars</th><th>Coins</th><th>Levels</th></tr>
 <?php
 //error_reporting(0);

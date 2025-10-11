@@ -2,13 +2,14 @@
 <html>
 	<head>
 		<title>Song Add</title>
-		<?php include "../../../incl/style.php"; ?>
+		<?php include "../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../incl/navigation.php"; ?>
+		<?php include "../../../incl/_nav.php"; ?>
 		
 		<div class="smain">
+			<h1>Song Add</h1>
 <?php
 //error_reporting(0);
 include "../incl/lib/connection.php";
@@ -21,6 +22,7 @@ if (filter_var($song, FILTER_VALIDATE_URL) == TRUE) {
 	if(strpos($song, 'soundcloud.com') !== false){
 		$soundcloud = true;
 		$songinfo = file_get_contents("https://api.soundcloud.com/resolve.json?url=".$song."&client_id=".$api_key);
+		vardump($songinfo);
 		$array = json_decode($songinfo);
 		if($array->downloadable == true){
 			$song = trim($array->download_url . "?client_id=".$api_key);
@@ -45,6 +47,7 @@ if (filter_var($song, FILTER_VALIDATE_URL) == TRUE) {
 		$name = str_replace(".mp3", "", basename($song));
 		$name = str_replace(".webm", "", $name);
 		$name = str_replace(".mp4", "", $name);
+		$name = explode("?rlkey", $name)[0];
 		$name = urldecode($name);
 		$name = $ep->remove($name);
 		$author = "Reupload";

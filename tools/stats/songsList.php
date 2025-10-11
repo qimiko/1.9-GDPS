@@ -2,14 +2,15 @@
 <html>
 	<head>
 		<title>Song List</title>
-		<?php include "../../../../incl/style.php"; ?>
+		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 	
 	<body>
-		<?php include "../../../../incl/navigation.php"; ?>
+		<?php include "../../../../incl/_nav.php"; ?>
 		
 		<div class="smain">
-			<table><tr><th>ID</th><th>AltID</th><th>Name</th></tr>
+			<h1>Song List</h1>
+			<table><tr><th>ID</th><th>Name</th></tr>
 <?php
 //error_reporting(0);
 include "../../incl/lib/connection.php";
@@ -21,8 +22,8 @@ echo "<p>Count: ".count($result)."</p>";
 
 foreach($result as &$song)
 {
-	echo "<tr><td>".$song["ID"]."</td><td>".(string)($song["ID"] - 4115655)."</td><td>".htmlspecialchars($song["name"],ENT_QUOTES)."</td></tr>";
-}
+	echo "<tr><td>".$song["ID"]."</td><td>".htmlspecialchars($song["name"],ENT_QUOTES)."</td></tr>";
+}//4115655
 ?>
 			</table>
 		</div>
