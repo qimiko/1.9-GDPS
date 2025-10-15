@@ -265,7 +265,7 @@ switch($type){
 //ACTUAL QUERY EXECUTION
 $querybase = "FROM levels
 	LEFT JOIN songs ON levels.songID = songs.ID
-	LEFT JOIN reuploadSongs R ON levels.songID=R.ID OR levels.songID=R.altId
+	LEFT JOIN reuploadSongs R ON levels.songID=R.ID
 	LEFT JOIN users ON levels.userID = users.userID $sugg $morejoins";
 if(!empty($params)){
 	$querybase .= " WHERE (" . implode(" ) AND ( ", $params) . ")";
