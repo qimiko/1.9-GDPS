@@ -7,6 +7,23 @@ if(empty($_POST["songID"])){
 	exit("-1");
 }
 $songid = ExploitPatch::remove($_POST["songID"]);
+
+// check for reuploaded song first
+$query3=$db->prepare("SELECT ID,name,authorID,authorName,size,isDisabled,download FROM reuploadSongs WHERE ID = :songid OR ID=:songid-4000000 LIMIT 1");
+$query3->execute([':songid' => $songid]);
+if ($query3->rowCount() > 0) {
+	$result4 = $query3->fetch();
+	if($result4["isDisabled"] == 1){
+		exit("-2");
+	}
+	$dl = $result4["download"];
+	if(strpos($dl, ':') !== false){
+		$dl = urlencode($dl);
+	}
+	echo "1~|~".$songid."~|~2~|~".$result4["name"]."~|~3~|~".$result4["authorID"]."~|~4~|~".$result4["authorName"]."~|~5~|~".$result4["size"]."~|~6~|~~|~10~|~".$dl."~|~7~|~~|~8~|~0";
+	exit();
+}
+
 $query3=$db->prepare("SELECT ID,name,authorID,authorName,size,isDisabled,download FROM songs WHERE ID = :songid LIMIT 1");
 $query3->execute([':songid' => $songid]);
 //todo: move this logic away from this file
