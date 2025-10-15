@@ -37,5 +37,11 @@ ALTER TABLE `reuploadSongs` ADD INDEX `reuploadSongs_altId`(`altId`);
 
 UPDATE `reuploadSongs` SET altId = (CASE WHEN ID>=6000000 THEN ID+4000000 ELSE ID END);
 
-ALTER TABLE `reuploadSongs` ALTER COLUMN `altId` DROP DEFAULT;
+UPDATE levels
+  INNER JOIN reuploadSongs ON levels.songID=reuploadSongs.altId
+  SET songID=reuploadSongs.ID
+  WHERE reuploadSongs.altId<>reuploadSongs.ID;
 
+-- we don't need the index anymore
+ALTER TABLE `reuploadSongs` DROP INDEX `reuploadSongs_altId`;
+ALTER TABLE `reuploadSongs` DROP COLUMN `altId`;

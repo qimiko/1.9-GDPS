@@ -82,6 +82,18 @@ if(isset($_POST["password"])){
 		$password = 0;
 	}
 }
+
+// check if we're using an altid for a music library song
+if ($songID > 10000000) {
+	$query = $db->prepare("SELECT ID FROM reuploadSongs WHERE ID=:songid LIMIT 1");
+	$query->execute([':songid' => $songID-4000000]);
+
+	$checkId = $query->fetchColumn();
+	if ($checkId) {
+		$songID = $checkId;
+	}
+}
+
 $id = $gs->getIDFromPost();
 $hostname = $gs->getIP();
 $userID = $mainLib->getUserID($id, $userName);
