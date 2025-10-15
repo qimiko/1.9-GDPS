@@ -92,6 +92,9 @@ if(!empty($dinfo)) {
 	$demonsCountDiff = min($demons - $allDemons, 3);
 	$dinfo = ($demonsCount["easyNormal"]+$demonsCountDiff).','.$demonsCount["mediumNormal"].','.$demonsCount["hardNormal"].','.$demonsCount["insaneNormal"].','.$demonsCount["extremeNormal"].','.$demonsCount["easyPlatformer"].','.$demonsCount["mediumPlatformer"].','.$demonsCount["hardPlatformer"].','.$demonsCount["insanePlatformer"].','.$demonsCount["extremePlatformer"].','.$dinfow.','.$dinfog;
 }
+
+$starsCount = '';
+$platformerCount = '';
 if(!empty($sinfo)) {
 	$sinfo = explode(",", $sinfo);
 	$starsCount = $sinfo[0].",".$sinfo[1].",".$sinfo[2].",".$sinfo[3].",".$sinfo[4].",".$sinfo[5].",".$sinfod.",".$sinfog;

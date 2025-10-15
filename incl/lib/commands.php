@@ -103,8 +103,8 @@ class Commands {
 			return true;
 		}
 		if(substr($comment,0,8) == '!feature' AND $gs->checkPermission($accountID, "commandFeature")){
-			$query = $db->prepare("UPDATE levels SET starFeatured='1' WHERE levelID=:levelID");
-			$query->execute([':levelID' => $levelID]);
+			$query = $db->prepare("UPDATE levels SET starFeatured='1', rateDate=:timestamp WHERE levelID=:levelID");
+			$query->execute([':levelID' => $levelID, ':timestamp' => $uploadDate]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('2', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
 			PostToHook("Command - Feature", "$uname featured $aLevelName by $aUserName ($levelID).");
@@ -112,8 +112,8 @@ class Commands {
 			return true;
 		}
 		if(substr($comment,0,5) == '!epic' AND $gs->checkPermission($accountID, "commandEpic")){
-			$query = $db->prepare("UPDATE levels SET starEpic='1' WHERE levelID=:levelID");
-			$query->execute([':levelID' => $levelID]);
+			$query = $db->prepare("UPDATE levels SET starEpic='1', rateDate=:timestamp WHERE levelID=:levelID");
+			$query->execute([':levelID' => $levelID, ':timestamp' => $uploadDate]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('4', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => "1", ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
 			PostToHook("Command - Feature", "$uname super'd $aLevelName by $aUserName ($levelID).");
