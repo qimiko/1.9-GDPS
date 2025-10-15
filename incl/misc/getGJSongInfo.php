@@ -8,7 +8,7 @@ if(empty($_POST["songID"])){
 }
 $songid = ExploitPatch::remove($_POST["songID"]);
 
-$query3=$db->prepare("SELECT ID,name,authorID,authorName,size,isDisabled,download FROM songsCombined WHERE ID = :songid OR ID = :songid-4000000 LIMIT 1");
+$query3=$db->prepare("SELECT ID,name,authorID,authorName,size,isDisabled,download FROM songsCombined WHERE ID = :songid LIMIT 1");
 $query3->execute([':songid' => $songid]);
 //todo: move this logic away from this file
 if($query3->rowCount() == 0) {
