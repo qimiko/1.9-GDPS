@@ -77,7 +77,7 @@ if($query3->rowCount() == 0) {
 	}
 
 	// silly workaround for my workaround. remove it once u9.0.5 releases
-	str_replace(array('~|~14~|~0', '~|~14~|~1'), '', $result);
+	$result = str_replace(array('~|~14~|~0', '~|~14~|~1'), '', $result);
 	echo $result;
 	$reup = SongReup::reup($result);
 }else{
