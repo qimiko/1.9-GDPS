@@ -26,3 +26,8 @@ INSERT INTO reuploadSongs (
 
 -- clear data
 DELETE FROM songs WHERE authorID=9 AND ID>=5105655;
+
+CREATE VIEW songsCombined AS
+  SELECT * FROM songs
+  UNION ALL
+  SELECT * FROM reuploadSongs;

@@ -51,7 +51,7 @@
 	} else {
 		$name = 'reupload';
 	}
-	$query = $db->prepare("SELECT ID,name,authorName,size FROM songs WHERE " . $searchType . " LIKE CONCAT('%', :name, '%') ORDER BY ID DESC LIMIT 5000");
+	$query = $db->prepare("SELECT ID,name,authorName,size FROM songsCombined WHERE " . $searchType . " LIKE CONCAT('%', :name, '%') ORDER BY ID DESC LIMIT 5000");
 	$query->execute([':name' => $name]);
 	$result = $query->fetchAll();
 	foreach ($result as &$song) {

@@ -3,6 +3,8 @@ include "../../incl/lib/connection.php";
 $query = $db->prepare("DELETE FROM users WHERE extID = ''");
 $query->execute();
 $query = $db->prepare("DELETE FROM songs WHERE download = ''");
+$query = $db->prepare("DELETE FROM reuploadSongs WHERE download = ''");
+
 $query->execute();
 echo "<p>Deleted invalid users and songs.</p>";
 ob_flush();
@@ -13,6 +15,8 @@ echo "Fixed reuploaded levels with invalid passwords.<br>";
 ob_flush();
 flush();
 $query = $db->prepare("DELETE FROM songs WHERE download = '10' OR download LIKE 'file:%'");
+$query = $db->prepare("DELETE FROM reuploadSongs WHERE download = '10' OR download LIKE 'file:%'");
+
 $query->execute();
 echo "Removed songs with nonsensical URLs.<br>";
 /*$query = $db->prepare("SELECT accountID, userName, registerDate FROM accounts");

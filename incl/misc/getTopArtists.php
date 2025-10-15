@@ -28,12 +28,12 @@ if($redirect == 1) {
 	echo $robsult;
 } else {
 	// select
-	$querywhat = "SELECT authorName, download FROM songs WHERE (authorName NOT LIKE '%Reupload%' AND authorName NOT LIKE 'unknown') GROUP BY authorName ORDER BY COUNT(authorName) DESC LIMIT 20 OFFSET $offset"; // offset couldn't be used in prepare statement for some very odd reason
+	$querywhat = "SELECT authorName, download FROM songsCombined WHERE (authorName NOT LIKE '%Reupload%' AND authorName NOT LIKE 'unknown') GROUP BY authorName ORDER BY COUNT(authorName) DESC LIMIT 20 OFFSET $offset"; // offset couldn't be used in prepare statement for some very odd reason
 	$query = $db->prepare($querywhat);
 	$query->execute();
 	$res = $query->fetchAll();
 	// count
-	$countquery = $db->prepare("SELECT count(DISTINCT(authorName)) FROM songs WHERE (authorName NOT LIKE '%Reupload%' AND authorName NOT LIKE 'unknown')");
+	$countquery = $db->prepare("SELECT count(DISTINCT(authorName)) FROM songsCombined WHERE (authorName NOT LIKE '%Reupload%' AND authorName NOT LIKE 'unknown')");
 	$countquery->execute();
 	$totalCount = $countquery->fetchColumn();
 	// parse

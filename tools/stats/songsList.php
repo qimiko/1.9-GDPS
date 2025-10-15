@@ -14,7 +14,7 @@
 <?php
 //error_reporting(0);
 include "../../incl/lib/connection.php";
-$query = $db->prepare("SELECT ID,name FROM songs WHERE ID >= 5000000 ORDER BY ID DESC");
+$query = $db->prepare("SELECT ID,name FROM songsCombined WHERE ID >= 5000000 ORDER BY ID DESC");
 $query->execute();
 $result = $query->fetchAll();
 
