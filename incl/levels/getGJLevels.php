@@ -265,19 +265,19 @@ switch($type){
 //ACTUAL QUERY EXECUTION
 $querybase = "FROM levels
 	LEFT JOIN songs ON levels.songID = songs.ID
-	LEFT JOIN reuploadSongs R on levels.songID=R.ID
+	LEFT JOIN reuploadSongs R on levels.songID-4000000=R.ID OR levels.songID=R.ID
 	LEFT JOIN users ON levels.userID = users.userID $sugg $morejoins";
 if(!empty($params)){
 	$querybase .= " WHERE (" . implode(" ) AND ( ", $params) . ")";
 }
 $query = "SELECT levels.*,
-	COALESCE(songs.ID, R.ID),
-	COALESCE(songs.name, R.name),
-	COALESCE(songs.authorID, R.authorID),
-	COALESCE(songs.authorName, R.authorName),
-	COALESCE(songs.size, R.size),
-	COALESCE(songs.isDisabled, R.isDisabled),
-	COALESCE(songs.download, R.download),
+	COALESCE(songs.ID, R.ID) as ID,
+	COALESCE(songs.name, R.name) as name,
+	COALESCE(songs.authorID, R.authorID) as authorID,
+	COALESCE(songs.authorName, R.authorName) as authorName,
+	COALESCE(songs.size, R.size) as size,
+	COALESCE(songs.isDisabled, R.isDisabled) as isDisabled,
+	COALESCE(songs.download, R.download) as download,
 	users.userName, users.extID$sug $querybase";
 if($order){
 	if($ordergauntlet){
