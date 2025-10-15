@@ -13,6 +13,15 @@ if(!is_numeric($levelID)){
 	exit("-1");
 }
 
+// check if level is rated first :)
+
+$query = $db->prepare("SELECT 1 FROM levels WHERE levelID=:levelID AND starDifficulty>0");
+$query->execute([':levelID' => $levelID]);
+
+if ($query->fetchColumn()) {
+	exit("-1");
+}
+
 $userID = $mainLib->getUserID($accountID);
 $query = $db->prepare("DELETE from levels WHERE levelID=:levelID AND userID=:userID AND starStars = 0 LIMIT 1");
 $query->execute([':levelID' => $levelID, ':userID' => $userID]);
