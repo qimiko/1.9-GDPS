@@ -313,7 +313,7 @@ foreach($result as &$level1) {
 		$featureStr = $level1["starEpic"] ? 0xB00B1E5 : $level1["starFeatured"];
 
 		$desc = $level1["levelDesc"];
-		if ($gameVersion < 20) {
+		if ($gameVersion < 20 && empty($_POST['gdbrowser'])) {
 			$desc = ExploitPatch::remove(base64_decode($desc));
 		}
 
