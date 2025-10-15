@@ -4,129 +4,155 @@
 		<title>Mod Actions</title>
 		<?php include "../../../../incl/_style.php"; ?>
 	</head>
-	
 	<body>
 		<?php include "../../../../incl/_nav.php"; ?>
-		
 		<div class="smain">
 			<h1>Mod Actions</h1>
+
+			<h2>Admins</h2>
+			<table>
+<tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>
 <?php
-
+//error_reporting(0);
 include "../../incl/lib/connection.php";
+require "../../incl/lib/mainLib.php";
 
-$types_ = array('1' => "Rated a level",
-				'2' => "Featured change",
-				'3' => "Coins verification state",
-				'4' => "Epic change",
-				'5' => "Set as daily feature",
-				'6' => "Deleted a level",
-				'7' => "Creator change",
-				'8' => "Renamed a level",
-				'9' => "Changed level password",
-				'10' => "Changed demon difficulty",
-				'11' => "Shared CP",
-				'12' => "Changed level publicity",
-				'13' => "Changed level description",
-				'14' => "Changed level CP reward");
+function formatUser($db, $mod) {
+	$query = $db->prepare("SELECT count(*) FROM modactions WHERE account = :id");
+	$query->execute([':id' => $mod["accountID"]]);
+	$actionscount = $query->fetchColumn();
+	$query = $db->prepare("SELECT count(*) FROM modactions WHERE account = :id AND type = '1'");
+	$query->execute([':id' => $mod["accountID"]]);
+	$lvlcount = $query->fetchColumn();
+	echo "<tr><td>${mod["userName"]}</td><td>${mod["accountID"]}</td><td>${actionscount}</td><td>${lvlcount}</td><td>${time}</td></tr>";
+}
 
-$query = $db->prepare("SELECT * FROM modactions ORDER BY ID DESC");
+$gs = new mainLib();
+$query = $db->prepare("SELECT accounts.accountID, accounts.userName FROM accounts WHERE isHeadAdmin=1 ORDER BY accounts.userName ASC");
 $query->execute();
 $result = $query->fetchAll();
-
-$exMods = array();
-$currentMods = array();
-
-foreach ($result as $action)
-{
-	$id = $action['account'];
-	
-	if (!array_key_exists($id, $exMods))
-	{
-		$queryName = $db->prepare("SELECT * FROM accounts WHERE accountID = :id");
-		$queryName->execute([':id' => $id]);
-		$exMods[$id] = $queryName->fetchAll()[0];
-		$exMods[$id]['rateCount'] = 0;
-		$exMods[$id]['actionCount'] = 0;
-	}
-	else
-	{
-		$exMods[$id]['actionCount']++;
-		
-		if ($action['type'] == 1)
-		{
-			$exMods[$id]['rateCount']++;
+foreach($result as &$mod){
+	//TODO: optimize the count queries
+	formatUser($db, $mod);
+}
+?>
+</table>
+			<h2>Moderators</h2>
+			<table>
+<tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>
+<?php
+$query = $db->prepare("SELECT accounts.accountID, accounts.userName FROM accounts WHERE isHeadAdmin=0 AND isAdmin=1 ORDER BY accounts.userName ASC");
+$query->execute();
+$result = $query->fetchAll();
+foreach($result as &$mod){
+	formatUser($db, $mod);
+}
+?>
+</table>
+			<h2>Ex-Moderators</h2>
+			<table>
+<tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>
+<?php
+$query = $db->prepare("SELECT accounts.accountID, accounts.userName, COUNT(CASE modactions.type WHEN 1 THEN 1 ELSE NULL END) as rateCount FROM accounts INNER JOIN modactions ON modactions.account=accounts.accountID WHERE accounts.isHeadAdmin=0 AND accounts.isAdmin=0 GROUP BY accounts.accountID, accounts.userName HAVING rateCount ORDER BY rateCount DESC");
+$query->execute();
+$result = $query->fetchAll();
+foreach($result as &$mod){
+	formatUser($db, $mod);
+}
+?>
+</table>
+<h1>Actions Log</h1>
+<table><tr><th>Moderator</th><th>Action</th><th>Value</th><th>Value2</th><th>LevelID</th><th>Time</th></tr>
+<?php
+$query = $db->prepare("SELECT modactions.*, accounts.userName FROM modactions INNER JOIN accounts ON modactions.account = accounts.accountID ORDER BY ID DESC");
+$query->execute();
+$result = $query->fetchAll();
+foreach($result as &$action){
+	//detecting mod
+	/*$account = $action["account"];
+	$query = $db->prepare("SELECT userName FROM accounts WHERE accountID = :id");
+	$query->execute([':id'=>$account]);
+	$account = $query->fetchColumn();*/
+	//detecting action
+	$value = $action["value"];
+	$value2 = $action["value2"];
+	$account = $action["userName"];
+	switch($action["type"]){
+		case 1:
+			$actionname = "Rated a level";
+			break;
+		case 2:
+			$actionname = "Featured change";
+			break;
+		case 3:
+			$actionname = "Coins verification state";
+			break;
+		case 4:
+			$actionname = "Epic change";
+			break;
+		case 5:
+			$actionname = "Set as daily feature";
+			if(is_numeric($value2)){
+				$value2 = date("d/m/Y G:i:s", $value2);
+			}
+			break;
+		case 6:
+			$actionname = "Deleted a level";
+			break;
+		case 7:
+			$actionname = "Creator change";
+			break;
+		case 8:
+			$actionname = "Renamed a level";
+			break;
+		case 9:
+			$actionname = "Changed level password";
+			break;
+		case 10:
+			$actionname = "Changed demon difficulty";
+			break;
+		case 11:
+			$actionname = "Shared CP";
+			break;
+		case 12:
+			$actionname = "Changed level publicity";
+			break;
+		case 13:
+			$actionname = "Changed level description";
+			break;
+		// there was a hole here?
+		case 14:
+			$actionname = "Changed level CP reward";
+			break;
+		case 15:
+			$actionname = "Un/banned a user";
+			break;
+		case 16:
+			$actionname = "Song ID change";
+			break;
+		default:
+			$actionname = $action["type"];
+			break;
+		}
+	if($action["type"] == 2 OR $action["type"] == 3 OR $action["type"] == 4 OR $action["type"] == 15){
+		if($action["value"] == 1){
+			$value = "True";
+		}else{
+			$value = "False";
 		}
 	}
-}
-
-$query = $db->prepare("SELECT * FROM accounts WHERE isAdmin = 1");
-$query->execute();
-$result2 = $query->fetchAll();
-
-foreach ($result2 as $account)
-{
-	$id = $account['accountID'];
-	
-	if (array_key_exists($id, $exMods))
-	{
-		$currentMods[$id] = $exMods[$id];
-		unset($exMods[$id]);
+	if($action["type"] == 5 OR $action["type"] == 6){
+		$value = "";
 	}
-	else
-	{
-		$queryName = $db->prepare("SELECT * FROM accounts WHERE accountID = :id");
-		$queryName->execute([':id' => $id]);
-		$currentMods[$id] = $queryName->fetchAll()[0];
-	}
-}
-
-echo '<h2>Admins</h2><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
-
-foreach ($currentMods as $mod)
-{
-	if ($mod['isHeadAdmin'] == 1)
-	{
-		echo "<tr><td>".$mod['userName']."</td><td>".$mod['accountID']."</td><td>".$mod['actionCount']."</td><td>".$mod['rateCount']."</td></tr>";
-	}
-}
-
-echo '</table><h2>Moderators</h2><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
-
-foreach ($currentMods as $mod)
-{
-	if ($mod['isHeadAdmin'] == 0)
-	{
-		echo "<tr><td>".$mod['userName']."</td><td>".$mod['accountID']."</td><td>".$mod['actionCount']."</td><td>".$mod['rateCount']."</td></tr>";
-	}
-}
-
-echo '</table><h2>Ex-Moderators</h2><table><tr><th>Username</th><th>AccountID</th><th>Actions</th><th>Rated Levels</th></tr>';
-
-usort($exMods, function($a, $b) {return $b['rateCount'] - $a['rateCount'];});
-
-foreach ($exMods as $mod)
-{
-	if ($mod['rateCount'] != 0 AND !empty($mod['userName']))
-	{
-		echo "<tr><td>".$mod['userName']."</td><td>".$mod['accountID']."</td><td>".$mod['actionCount']."</td><td>".$mod['rateCount']."</td></tr>";
-	}
-}
-
-echo '</table><h2>Actions</h2><table><tr><th>Username</th><th>Type</th><th>LevelID</th><th>Value</th><th>Value2</th><th>Time</th></tr>';
-
-foreach ($result as $action)
-{
-	$username = array_key_exists($action['account'], $exMods) ? $exMods[$action['account']]['userName'] : $currentMods[$action['account']]['userName'];
-	$type = $types_[$action['type']];
-	$levelid = $action["value3"];
-	$value1 = $action["value"];
-	$value2 = $action["value2"];
 	$time = date("d/m/Y G:i:s", $action["timestamp"]);
+	if($action["type"] == 5 AND $action["value2"] > time()){
+		echo "<tr><td>".$account."</td><td>".$actionname."</td><td>".$value."</td><td>".$value2."</td><td>future</td><td>".$time."</td></tr>";
+	}else{
+		echo "<tr><td>".$account."</td><td>".$actionname."</td><td>".$value."</td><td>".$value2."</td><td>".$action["value3"]."</td><td>".$time."</td></tr>";
+	}
 	
-	echo "<tr><td>$username</td><td>$type</td><td>$levelid</td><td>$value1</td><td>$value2</td><td>$time</td></tr>";
 }
-
-?>			
+?>
 			</table>
 		</div>
 	</body>

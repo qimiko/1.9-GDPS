@@ -26,28 +26,46 @@
 include "../../incl/lib/connection.php";
 require "../../incl/lib/generatePass.php";
 require "../../incl/lib/webhooks/webhook.php";
+require_once "../../incl/lib/exploitPatch.php";
 
 if (!empty($_POST['u']) AND !empty($_POST['p']) AND !empty($_POST['id']))
 {
-	$generatePass = new generatePass();
-	$pass = $generatePass->isValidUsrname($_POST['u'], $_POST['p']);
-	
+	$u = ExploitPatch::remove($_POST['u']);
+	$p = ExploitPatch::remove($_POST['p']);
+
+	$pass = GeneratePass::isValidUsrname($u, $p);
+
 	$q = $db->prepare("SELECT isHeadAdmin FROM accounts WHERE userName = :un");
-	$q->execute([':un' => $_POST['u']]);
+	$q->execute([':un' => $u]);
 	$result = $q->fetch()[0];
 	
 	if ($pass)
 	{
 		if ($result == "1")
 		{
+			$id = ExploitPatch::number($_POST['id']);
+			$mod = ExploitPatch::number($_POST['mod']);
+
 			$query = $db->prepare("UPDATE accounts SET isAdmin = :mod WHERE accountID = :accid");
-			$query->execute([':mod' => $_POST['mod'], ':accid' => $_POST['id']]);
+			$query->execute([':mod' => $mod, ':accid' => $id]);
 			$affected = $query->rowCount();
-			
+
+			$modQuery = $db->prepare("SELECT roleID FROM roles WHERE roleName='mod'");
+			$modQuery->execute();
+			$roleId = $modQuery->fetchColumn();
+
+			if ($mod) {
+				$query = $db->prepare("INSERT INTO roleassign (roleID, accountID) VALUES (:roleid, :accid);");
+				$query->execute([':roleid' => $roleId, ':accid' => $id]);
+			} else {
+				$query = $db->prepare("DELETE FROM roleassign WHERE roleID=:roleid AND accountID=:accid;");
+				$query->execute([':roleid' => $roleId, ':accid' => $id]);
+			}
+
 			if ($affected)
 			{
 				$q = $db->prepare("SELECT userName FROM users WHERE extID = :accid");
-				$q->execute([':accid' => $_POST['id']]);
+				$q->execute([':accid' => $id]);
 				
 				$username = $q->fetch()[0];
 				

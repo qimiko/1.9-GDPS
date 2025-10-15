@@ -29,8 +29,7 @@ require "../../incl/lib/webhooks/webhook.php";
 
 if (!empty($_POST['u']) AND !empty($_POST['p']) AND !empty($_POST['id']))
 {
-	$generatePass = new generatePass();
-	$pass = $generatePass->isValidUsrname($_POST['u'], $_POST['p']);
+	$pass = GeneratePass::isValidUsrname($_POST['u'], $_POST['p']);
 	
 	$q = $db->prepare("SELECT isHeadAdmin FROM accounts WHERE userName = :un AND (accountID = 71 OR accountID = 47360943)");
 	$q->execute([':un' => $_POST['u']]);
@@ -43,7 +42,19 @@ if (!empty($_POST['u']) AND !empty($_POST['p']) AND !empty($_POST['id']))
 			$query = $db->prepare("UPDATE accounts SET isHeadAdmin = :admin WHERE accountID = :accid");
 			$query->execute([':admin' => $_POST['admin'], ':accid' => $_POST['id']]);
 			$affected = $query->rowCount();
-			
+
+			$modQuery = $db->prepare("SELECT roleID FROM roles WHERE roleName='admin'");
+			$modQuery->execute();
+			$roleId = $modQuery->fetchColumn();
+
+			if ($mod) {
+				$query = $db->prepare("INSERT INTO roleassign (roleID, accountID) VALUES (:roleid, :accid);");
+				$query->execute([':roleid' => $roleId, ':accid' => $id]);
+			} else {
+				$query = $db->prepare("DELETE FROM roleassign WHERE roleID=:roleid AND accountID=:accid;");
+				$query->execute([':roleid' => $roleId, ':accid' => $id]);
+			}
+
 			if ($affected)
 			{
 				$q = $db->prepare("SELECT userName FROM users WHERE extID = :accid");

@@ -5,41 +5,35 @@ chdir(dirname(__FILE__));
 include "../lib/connection.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/GJPCheck.php";
-$ep = new exploitPatch();
 $stars = 0;
 $count = 0;
 $xi = 0;
 $lbstring = "";
+$date = date("d-m");
 if(empty($_POST["gameVersion"])){
-	$sign = "<> 'ffff'";
+	$sign = "< 20 AND gameVersion <> 0";
 }else{
-	$sign = "<> 'ffff'";
+	$gameVersion = ExploitPatch::number($_POST["gameVersion"]);
+	$sign = "<= $gameVersion";
 }
 if(!empty($_POST["accountID"])){
-	$accountID = $ep->remove($_POST["accountID"]);
-	$gjp = $ep->remove($_POST["gjp"]);
-	$GJPCheck = new GJPCheck(); //gjp check
-	$gjpresult = $GJPCheck->check($gjp,$accountID);
-	if($gjpresult != 1){
-		// exit("-1");
-	}
+	$accountID = GJPCheck::getAccountIDOrDie();
 }else{
-	$accountID = $ep->remove($_POST["udid"]);
+	$accountID = ExploitPatch::remove($_POST["udid"]);
 	if(is_numeric($accountID)){
 		exit("-1");
 	}
 }
 
-$type = $ep->remove($_POST["type"]);
-if($type == "top" OR $type == "creators" OR $type == "relative")
-{
-	if($type == "top")
-	{
-		$query = "SELECT * FROM users WHERE isBanned = '0' AND stars > 0 AND isRegistered = '1' ORDER BY stars DESC LIMIT 100";
+$type = ExploitPatch::remove($_POST["type"]);
+if($type == "top" OR $type == "creators" OR $type == "relative"){
+	if($type == "top"){
+		$query = $db->prepare("SELECT * FROM users WHERE isBanned = '0' AND gameVersion $sign AND stars > 0 AND isRegistered = '1' ORDER BY stars DESC LIMIT 100");
+		$query->execute();
 	}
-	if($type == "creators")
-	{
-		$query = "SELECT * FROM users WHERE isCreatorBanned = '0' AND creatorPoints > 0 ORDER BY creatorPoints DESC LIMIT 100";
+	if($type == "creators"){
+		$query = $db->prepare("SELECT * FROM users WHERE isCreatorBanned = '0' AND creatorPoints > 0 ORDER BY creatorPoints DESC LIMIT 100");
+		$query->execute();
 	}
 	if($type == "relative")
 	{
@@ -48,36 +42,35 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 		$query->execute([':accountID' => $accountID]);
 		$result = $query->fetchAll();
 		$user = $result[0];
-		$stars = (int)$user["stars"];
+		$stars = $user["stars"];
 		if($_POST["count"]){
-			$count = $ep->remove($_POST["count"]);
+			$count = ExploitPatch::remove($_POST["count"]);
 		}else{
 			$count = 50;
 		}
 		$count = floor($count / 2);
-		$query = "SELECT	A.* FROM	(
+		$query = $db->prepare("SELECT	A.* FROM	(
 			(
 				SELECT	*	FROM users
-				WHERE stars <= $stars
+				WHERE stars <= :stars
 				AND isBanned = 0
-				AND isRegistered = 1
+				AND gameVersion $sign
 				ORDER BY stars DESC
 				LIMIT $count
 			)
 			UNION
 			(
 				SELECT * FROM users
-				WHERE stars >= $stars
+				WHERE stars >= :stars
 				AND isBanned = 0
-				AND isRegistered = 1
+				AND gameVersion $sign
 				ORDER BY stars ASC
 				LIMIT $count
 			)
 		) as A
-		ORDER BY A.stars DESC";
+		ORDER BY A.stars DESC");
+		$query->execute([':stars' => $stars]);
 	}
-	$query = $db->prepare($query);
-	$query->execute();
 	$result = $query->fetchAll();
 	if($type == "relative"){
 		$user = $result[0];
@@ -97,14 +90,9 @@ if($type == "top" OR $type == "creators" OR $type == "relative")
 		$xi = $leaderboard["rank"] - 1;
 	}
 	foreach($result as &$user) {
-		$extid = 0;
-		if(is_numeric($user["extID"])){
-			$extid = $user["extID"];
-		}
 		$xi++;
-		
-		$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["stars"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"].":52:0|";
-		
+		$extid = (is_numeric($user['extID']) || $accountID == $user['extID']) ? $user['extID'] : 0;
+		$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["stars"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"].":52:".$user["moons"]."|";
 	}
 }
 
@@ -140,9 +128,10 @@ if($type == "week")
 		if($user["isBanned"] == 0 && $user["isRegistered"] == 1)
 		{
 			$xi++;
-			$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":4:-1:13:-1:17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$stars.":7:".$user["extID"]."|";
+			$extid = (is_numeric($user['extID']) || $accountID == $user['extID']) ? $user['extID'] : 0;
+			$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["stars"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"].":52:".$user["moons"]."|";
 		}
-	}  
+	}
 }
 
 if($type == "friends"){
@@ -172,6 +161,7 @@ if($type == "friends"){
 		$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["stars"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"]."|";
 	}
 }
+
 if($lbstring == ""){
 	exit("-1");
 }

@@ -1,22 +1,17 @@
 <?php
+echo '-1';
+/*
 chdir(dirname(__FILE__));
 //error_reporting(0);
 include "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
-$ep = new exploitPatch();
 $msgstring = "";
-$userid = 1337;
 //code begins
-$toAccountID = $ep->remove($_POST["accountID"]);
-$gjp = $ep->remove($_POST["gjp"]);
-$page = $ep->remove($_POST["page"]);
+$toAccountID = GJPCheck::getAccountIDOrDie();
+$page = ExploitPatch::remove($_POST["page"]);
 $offset = $page * 10;
-$GJPCheck = new GJPCheck();
-$gjpresult = $GJPCheck->check($gjp,$toAccountID);
-if($gjpresult != 1){
-	exit("-1");
-}
+
 if(!isset($_POST["getSent"]) OR $_POST["getSent"] != 1){
 	$query = "SELECT * FROM messages WHERE toAccountID = :toAccountID ORDER BY messageID DESC LIMIT 10 OFFSET $offset";
 	$countquery = "SELECT count(*) FROM messages WHERE toAccountID = :toAccountID";
@@ -51,4 +46,5 @@ foreach ($result as &$message1) {
 }
 $msgstring = substr($msgstring, 0, -1);
 echo $msgstring ."#".$msgcount.":".$offset.":10";
+*/
 ?>

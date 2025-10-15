@@ -1,21 +1,23 @@
 <?php
-//error_reporting(0);
+//header
 chdir(dirname(__FILE__));
 include "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
-$ep = new exploitPatch();
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
-$GJPCheck = new GJPCheck();
-$lvlstring = "";
-$userstring = "";
-$songsstring  = "";
-$lvlsmultistring = "";
-$orderenabled = true;
-$params = array("NOT unlisted = 1");
+require "../lib/generateHash.php";
+
+//initializing variables
+$lvlstring = ""; $userstring = ""; $songsstring = ""; $lvlsmultistring = []; $epicParams = []; $str = ""; $order = "uploadDate";
+$orderenabled = true; $ordergauntlet = false; $isIDSearch = false;
+$params = array("unlisted = 0");
+$morejoins = "";
+$sug = "";
+$sugg = "";
+
 if(!empty($_POST["gameVersion"])){
-	$gameVersion = $ep->remove($_POST["gameVersion"]);
+	$gameVersion = ExploitPatch::number($_POST["gameVersion"]);
 }else{
 	$gameVersion = 0;
 }
@@ -23,72 +25,58 @@ if(!is_numeric($gameVersion)){
 	exit("-1");
 }
 if($gameVersion == 20){
-	$binaryVersion = $ep->remove($_POST["binaryVersion"]);
+	$binaryVersion = ExploitPatch::number($_POST["binaryVersion"]);
 	if($binaryVersion > 27){
 		$gameVersion++;
 	}
 }
+
+if ($gameVersion >= 20) {
+	$gameVersion = 19;
+}
+
 if(!empty($_POST["type"])){
-	$type = $ep->remove($_POST["type"]);
+	$type = ExploitPatch::number($_POST["type"]);
 }else{
 	$type = 0;
 }
-$query = "";
-if(!empty($_POST["len"])){
-	$len = $ep->remove($_POST["len"]);
-}else{
-	$len = "-";
-}
-if(!empty($_POST["len"])){
-	$diff = $ep->remove($_POST["diff"]);
+if(!empty($_POST["diff"])){
+	$diff = ExploitPatch::numbercolon($_POST["diff"]);
 }else{
 	$diff = "-";
 }
+
+
 //ADDITIONAL PARAMETERS
 if($gameVersion==0){
-	$params[] = "gameVersion <= 18";
+	$params[] = "levels.gameVersion <= 18";
 }else{
-	$params[] = " gameVersion <= '$gameVersion'";
-}
-if(!empty($_POST["featured"]) AND $_POST["featured"]==1){
-	$params[] = "starFeatured = 1";
+	$params[] = "levels.gameVersion <= '$gameVersion'";
 }
 if(!empty($_POST["original"]) AND $_POST["original"]==1){
 	$params[] = "original = 0";
 }
 if(!empty($_POST["coins"]) AND $_POST["coins"]==1){
-		$params[] = "starCoins = 1 AND NOT coins = 0";
-}
-if(!empty($_POST["epic"]) AND $_POST["epic"]==1){
-	$params[] = "starEpic = 1";
+		$params[] = "starCoins = 1 AND NOT levels.coins = 0";
 }
 if(!empty($_POST["uncompleted"]) AND $_POST["uncompleted"]==1){
-	$completedLevels = $ep->remove($_POST["completedLevels"]);
-	$completedLevels = explode("(",$completedLevels)[1];
-	$completedLevels = explode(")",$completedLevels)[0];
-	$completedLevels = $db->quote($completedLevels);
-	$completedLevels = str_replace("'","", $completedLevels);
+	$completedLevels = ExploitPatch::numbercolon($_POST["completedLevels"]);
 	$params[] = "NOT levelID IN ($completedLevels)";
 }
 if(!empty($_POST["onlyCompleted"]) AND $_POST["onlyCompleted"]==1){
-	$completedLevels = $ep->remove($_POST["completedLevels"]);
-	$completedLevels = explode("(",$completedLevels)[1];
-	$completedLevels = explode(")",$completedLevels)[0];
-	$completedLevels = $db->quote($completedLevels);
-	$completedLevels = str_replace("'","", $completedLevels);
+	$completedLevels = ExploitPatch::numbercolon($_POST["completedLevels"]);
 	$params[] = "levelID IN ($completedLevels)";
 }
 
-$gdbrowser = $_POST['gdbrowser'] == '1';
+$gdbrowser = !empty($_POST['gdbrowser']);
 
 if(!empty($_POST["song"]) && (!$gdbrowser || $_POST['song'] != '-')){
 	if(empty($_POST["customSong"])){
-		$song = (int)$ep->remove($_POST["song"]);
-		$song = str_replace("'", "", $db->quote($song));
+		$song = ExploitPatch::number($_POST["song"]);
 		$song = $song -1;
 		$params[] = "audioTrack = '$song' AND songID = 0";
 	}else{
-		$song = $ep->remove($_POST["song"]);
+		$song = ExploitPatch::number($_POST["song"]);
 		$params[] = "songID = '$song'";
 	}
 }
@@ -102,18 +90,32 @@ if(!empty($_POST["noStar"])){
 	$params[] = "starStars = 0";
 }
 if(!empty($_POST["gauntlet"])){
-	$order = false;
-	$gauntlet = $ep->remove($_POST["gauntlet"]);
+	$ordergauntlet = true;
+	$order = "starStars";
+	$gauntlet = ExploitPatch::remove($_POST["gauntlet"]);
 	$query=$db->prepare("SELECT * FROM gauntlets WHERE ID = :gauntlet");
 	$query->execute([':gauntlet' => $gauntlet]);
 	$actualgauntlet = $query->fetch();
 	$str = $actualgauntlet["level1"].",".$actualgauntlet["level2"].",".$actualgauntlet["level3"].",".$actualgauntlet["level4"].",".$actualgauntlet["level5"];
 	$params[] = "levelID IN ($str)";
+	$type = -1;
 }
+if(isset($_POST["len"])) {
+	$len = ExploitPatch::numbercolon($_POST["len"]);
+}else{
+	$len = "-";
+}
+if($len != "-"){
+	$params[] = "levelLength IN ($len)";
+}
+if(!empty($_POST["featured"])) $epicParams[] = "starFeatured = 1";
+if(!empty($_POST["epic"])) $epicParams[] = "starEpic = 1";
+if(!empty($_POST["mythic"])) $epicParams[] = "starEpic = 2";
+if(!empty($_POST["legendary"])) $epicParams[] = "starEpic = 3";
+$epicFilter = implode(" OR ", $epicParams);
+if(!empty($epicFilter)) $params[] = $epicFilter;
+
 //DIFFICULTY FILTERS
-$diff = $db->quote($diff);
-$diff = str_replace("'","", $diff);
-$diff = explode(")",$diff)[0];
 switch($diff){
 	case -1:
 		$params[] = "starDifficulty = '0'";
@@ -123,7 +125,7 @@ switch($diff){
 		break;
 	case -2:
 		if(!empty($_POST["demonFilter"])){
-			$demonFilter = $ep->remove($_POST["demonFilter"]);
+			$demonFilter = ExploitPatch::number($_POST["demonFilter"]);
 		}else{
 			$demonFilter = 0;
 		}
@@ -151,120 +153,132 @@ switch($diff){
 	case "-";
 		break;
 	default:
-		$diff = str_replace(",", "0,", $diff) . "0";
-		$params[] = "starDifficulty IN ($diff) AND starAuto = '0' AND starDemon = '0'";
+		if($diff){
+			$diff = str_replace(",", "0,", $diff) . "0";
+			$params[] = "starDifficulty IN ($diff) AND starAuto = '0' AND starDemon = '0'";
+		}
 		break;
 }
-//LENGTH FILTERS
-$len = $db->quote($len);
-$len = str_replace("'","", $len);
-if($len != "-"){
-	$params[] = "levelLength IN ($len)";
-}
 //TYPE DETECTION
+//TODO: the 2 non-friend types that send GJP in 2.11
 if(!empty($_POST["str"])){
-	$str = $ep->remove($_POST["str"]);
-	$str = $db->quote($str);
-	$str = str_replace("'","", $str);
-}else{
-	$str = "";
+	$str = ExploitPatch::remove($_POST["str"]);
 }
 if(isset($_POST["page"]) AND is_numeric($_POST["page"])){
-	$page = $ep->remove($_POST["page"]);
+	$offset = ExploitPatch::number($_POST["page"]) . "0";
 }else{
-	$page = 0;
+	$offset = 0;
 }
-$lvlpagea = $page*10;
-if($type==0 OR $type==15){ //most liked, changed to 15 in GDW for whatever reason
-	$order = "likes";
-	if($str!=""){
-		if(is_numeric($str)){
-			$params = array("levelID = '$str'");
-		}else{
-			$params[] = "levelName LIKE '%$str%'";
-		}
-	}
-}
-if($type==1){
-	$order = "downloads";
-}
-if($type==2){
-	$order = "likes";
-}
-if($type==3){ //TRENDING
-	$uploadDate = time() - (7 * 24 * 60 * 60);
-	$params[] = "uploadDate > $uploadDate ";
-	$order = "likes";
-}
-if($type==5){
-	$params[] = "userID = '$str'";
-}
-if($type==6 OR $type==17){ //featured
-	$params[] = "NOT starFeatured = 0";
-}
-if($type==16){ //HALL OF FAME
-	$params[] = "NOT starEpic = 0";
-}
-if($type==7){ //MAGIC
-	$params[] = "objects > 9999";
-}
-if($type==10){ //MAP PACKS
-	$order = false;
-	$params[] = "levelID IN ($str)";
-}
-if($type==11){
-	$params[] = "NOT starStars = 0";
-}
-if($type==12){ //FOLLOWED
-	$followed = $ep->remove($_POST["followed"]);
-	$followed = $db->quote($followed);
-	$followed = explode(")",$followed)[0];
-	$followed = str_replace("'","", $followed);
-	$params[] = "extID IN ($followed)";
-}
-if($type==13){ //FRIENDS
-	$peoplearray = array();
-	$accountID = $ep->remove($_POST["accountID"]);
-	$query = "SELECT person1,person2 FROM friendships WHERE person1 = :accountID OR person2 = :accountID"; //selecting friendships
-	$query = $db->prepare($query);
-	$query->execute([':accountID' => $accountID]);
-	$result = $query->fetchAll();//getting friends
-	if($query->rowCount() == 0){
-		exit("-2");//if youre lonely
-	}
-	else
-	{//oh so you actually have some friends kden
-		foreach ($result as &$friendship) {
-			$person = $friendship["person1"];
-			if($friendship["person1"] == $accountID){
-				$person = $friendship["person2"];
+
+$maxLevels = 10;
+
+switch($type){
+	case 0:
+	case 15: //most liked, changed to 15 in GDW for whatever reason
+		$order = "likes";
+		if(!empty($str)){
+			if(is_numeric($str)){
+				$params = array("levelID = '$str'");
+				$isIDSearch = true;
+			}else{
+				$params[] = "levelName LIKE '%$str%'";
 			}
-			$peoplearray[] = $person;
 		}
-		$gjp = $ep->remove($_POST["gjp"]);
-		$gjp = $db->quote($gjp);
-		$gjp = str_replace("'","", $gjp);
-		$gjpresult = $GJPCheck->check($gjp,$accountID);
-		if($gjpresult == 1){
-			$whereor = implode(",", $peoplearray);
-			$params[] = "extID in ($whereor)";
-		}
-	}
+		break;
+	case 1:
+		$order = "downloads";
+		break;
+	case 2:
+		$order = "likes";
+		break;
+	case 3: //TRENDING
+		$uploadDate = time() - (7 * 24 * 60 * 60);
+		$params[] = "uploadDate > $uploadDate ";
+		$order = "likes";
+		break;
+	case 5:
+		$params[] = "levels.userID = '$str'";
+		break;
+	case 6: //featured
+	case 17: //featured GDW //TODO: make this list of daily levels
+		if($gameVersion > 21) $params[] = "NOT starFeatured = 0 OR NOT starEpic = 0";
+		else $params[] = "NOT starFeatured = 0";
+		$order = "rateDate DESC,uploadDate";
+		break;
+	case 16: //HALL OF FAME
+		$params[] = "NOT starEpic = 0";
+		$order = "rateDate DESC,uploadDate";
+		break;
+	case 7: //MAGIC
+		$params[] = "objects > 9999"; // L
+		break;
+	case 10: //MAP PACKS
+	case 19: //unknown but same as map packs (on real GD type 10 has star rated filter and 19 doesn't)
+		$order = false;
+		$params[] = "levelID IN ($str)";
+		break;
+	case 11: //AWARDED
+		$params[] = "NOT starStars = 0";
+		$order = "rateDate DESC,uploadDate";
+		break;
+	case 12: //FOLLOWED
+		$followed = ExploitPatch::numbercolon($_POST["followed"]);
+		$params[] = "users.extID IN ($followed)";
+		break;
+	case 13: //FRIENDS
+		$accountID = GJPCheck::getAccountIDOrDie();
+		$peoplearray = $gs->getFriends($accountID);
+		$whereor = implode(",", $peoplearray);
+		$params[] = "users.extID IN ($whereor)";
+		break;
+	case 21: //DAILY SAFE
+		$morejoins = "INNER JOIN dailyfeatures ON levels.levelID = dailyfeatures.levelID";
+		$params[] = "dailyfeatures.type = 0";
+		$order = "dailyfeatures.feaID";
+		break;
+	case 22: //WEEKLY SAFE
+		$morejoins = "INNER JOIN dailyfeatures ON levels.levelID = dailyfeatures.levelID";
+		$params[] = "dailyfeatures.type = 1";
+		$order = "dailyfeatures.feaID";
+		break;
+	case 23: //EVENT SAFE (assumption)
+		$morejoins = "INNER JOIN dailyfeatures ON levels.levelID = dailyfeatures.levelID";
+		$params[] = "dailyfeatures.type = 2";
+		$order = "dailyfeatures.feaID";
+		break;
+	case 25: // LIST LEVELS
+		$listLevels = $gs->getListLevels($str);
+		$params = array("levelID IN (".$listLevels.")");
+		break;
+	case 26: // LOCAL LIST LEVELS
+		$maxLevels = 100;
+		$order = false;
+		$params[] = "levelID IN ($str)";
+		break;
+	case 27: // SENT LEVELS
+		$sug = ", suggest.suggestLevelId, suggest.timestamp";
+        	$sugg = "LEFT JOIN suggest ON levels.levelID = suggest.suggestLevelId";
+		$params[] = "suggestLevelId > 0";
+    		$order = 'suggest.timestamp';
+		break;
 }
-if(empty($order)){
-	$order = "uploadDate";
-}
-$querybase = "FROM levels";
+//ACTUAL QUERY EXECUTION
+$querybase = "FROM levels LEFT JOIN songs ON levels.songID = songs.ID LEFT JOIN users ON levels.userID = users.userID $sugg $morejoins";
 if(!empty($params)){
 	$querybase .= " WHERE (" . implode(" ) AND ( ", $params) . ")";
 }
-$query = "(SELECT * $querybase ) ";
+$query = "SELECT levels.*, songs.ID, songs.name, songs.authorID, songs.authorName, songs.size, songs.isDisabled, songs.download, users.userName, users.extID$sug $querybase";
 if($order){
-	$query .= "ORDER BY $order DESC";
+	if($ordergauntlet){
+		$query .= "ORDER BY $order ASC";
+	}else{
+		$query .= "ORDER BY $order DESC";
+	}
 }
-$query .= " LIMIT 10 OFFSET $lvlpagea";
+$query .= " LIMIT $maxLevels OFFSET $offset";
 //echo $query;
 $countquery = "SELECT count(*) $querybase";
+//echo $query;
 $query = $db->prepare($query);
 $query->execute();
 //echo $countquery;
@@ -275,33 +289,39 @@ $result = $query->fetchAll();
 $levelcount = $query->rowCount();
 foreach($result as &$level1) {
 	if($level1["levelID"]!=""){
-		$lvlsmultistring .= $level1["levelID"].",";
+		if($isIDSearch AND $level1['unlisted'] > 1) {
+			if(!isset($accountID)) $accountID = GJPCheck::getAccountIDOrDie();
+			if(!$gs->isFriends($accountID, $level1['extID']) && $accountID != $level1['extID']) break;
+		}
+		$lvlsmultistring[] = ["levelID" => $level1["levelID"], "stars" => $level1["starStars"], 'coins' => $level1["starCoins"]];
 		if(!empty($gauntlet)){
 			$lvlstring .= "44:$gauntlet:";
 		}
 		$featureStr = $level1["starEpic"] ? 0xB00B1E5 : $level1["starFeatured"];
-		
-		$lvlstring .= "1:".$level1["levelID"].":2:".$level1["levelName"].":5:".$level1["levelVersion"].":6:".$level1["userID"].":8:10:9:".$level1["starDifficulty"].":10:".$level1["downloads"].":12:".$level1["audioTrack"].":13:".$level1["gameVersion"].":14:".$level1["likes"].":17:".$level1["starDemon"].":43:".$level1["starDemonDiff"].":25:".$level1["starAuto"].":18:".$level1["starStars"].":19:".$featureStr.":42:".$level1["starEpic"].":45:".$level1["objects"].":3:".$level1["levelDesc"].":15:".$level1["levelLength"].":30:".$level1["original"].":31:0:37:".$level1["coins"].":38:".$level1["starCoins"].":39:".$level1["requestedStars"].":46:1:47:2".":35:".$level1["songID"]."|";
+
+		$desc = $level1["levelDesc"];
+		if ($gameVersion < 20) {
+			$desc = ExploitPatch::remove(base64_decode($desc));
+		}
+
+		$lvlstring .= "1:".$level1["levelID"].":2:".$level1["levelName"].":5:".$level1["levelVersion"].":6:".$level1["userID"].":8:10:9:".$level1["starDifficulty"].":10:".$level1["downloads"].":12:".$level1["audioTrack"].":13:".$level1["gameVersion"].":14:".$level1["likes"].":17:".$level1["starDemon"].":43:".$level1["starDemonDiff"].":25:".$level1["starAuto"].":18:".$level1["starStars"].":19:".$featureStr.":42:".$level1["starEpic"].":45:".$level1["objects"].":3:".$desc.":15:".$level1["levelLength"].":30:".$level1["original"].":31:".$level1['twoPlayer'].":37:".$level1["coins"].":38:".$level1["starCoins"].":39:".$level1["requestedStars"].":46:1:47:2:40:".$level1["isLDM"].":35:".$level1["songID"]."|";
 		if($level1["songID"]!=0){
-			$song = $gs->getSongString($level1["songID"]);
+			$song = $gs->getSongString($level1);
 			if($song){
-				$songsstring .= $gs->getSongString($level1["songID"]) . "~:~";
+				$songsstring .= $song . "~:~";
 			}
 		}
-		$userstring .= $gs->getUserString($level1["userID"])."|";
+		$userstring .= $gs->getUserString($level1)."|";
 	}
 }
 $lvlstring = substr($lvlstring, 0, -1);
-$lvlsmultistring = substr($lvlsmultistring, 0, -1);
 $userstring = substr($userstring, 0, -1);
 $songsstring = substr($songsstring, 0, -3);
 echo $lvlstring."#".$userstring;
 if($gameVersion > 18){
 	echo "#".$songsstring;
 }
-echo "#".$totallvlcount.":".$lvlpagea.":10";
+echo "#".$totallvlcount.":".$offset.":".$maxLevels;
 echo "#";
-require "../lib/generateHash.php";
-$hash = new generateHash();
-echo $hash->genMulti($lvlsmultistring);
+echo GenerateHash::genMulti($lvlsmultistring);
 ?>

@@ -1,14 +1,15 @@
 <?php
+echo '#0:0:0';
+/*
 chdir(dirname(__FILE__));
 //error_reporting(0);
 include "../lib/connection.php";
 require_once "../lib/exploitPatch.php";
-$ep = new exploitPatch();
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 $commentstring = "";
-$accountid = $ep->remove($_POST["accountID"]);
-$page = $ep->remove($_POST["page"]);
+$accountid = ExploitPatch::remove($_POST["accountID"]);
+$page = ExploitPatch::remove($_POST["page"]);
 $commentpage = $page*10;
 $userID = $gs->getUserID($accountid);
 $query = "SELECT comment, userID, likes, isSpam, commentID, timestamp FROM acccomments WHERE userID = :userID ORDER BY timeStamp DESC LIMIT 10 OFFSET $commentpage";
@@ -30,4 +31,5 @@ foreach($result as &$comment1) {
 $commentstring = substr($commentstring, 0, -1);
 echo $commentstring;
 echo "#".$commentcount.":".$commentpage.":10";
+*/
 ?>

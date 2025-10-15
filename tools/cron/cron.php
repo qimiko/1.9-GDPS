@@ -14,7 +14,7 @@
 <?php
 
 chdir(dirname(__FILE__));
-set_time_limit(0);
+if(function_exists("set_time_limit")) set_time_limit(0);
 include "fixcps.php";
 ob_flush();
 flush();
@@ -24,6 +24,13 @@ flush();
 include "deleteInvalidUsersAndSongs.php";
 ob_flush();
 flush();
+include "songsCount.php";
+ob_flush();
+flush();
+include "fixnames.php";
+ob_flush();
+flush();
+echo "CRON done";
 file_put_contents("../logs/cronlastrun.txt",time());
 ?>
 

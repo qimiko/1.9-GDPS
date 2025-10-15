@@ -29,8 +29,7 @@ if ($stage == false)
 }
 else if ($stage AND array_key_exists("levels", $_POST) == false)
 {
-	$generatePass = new generatePass();
-	$pass = $generatePass->isValidUsrname($_POST["userName"], $_POST["password"]);
+	$pass = GeneratePass::isValidUsrname($_POST["userName"], $_POST["password"]);
 	if ($pass == 1)
 	{
 		$query = $db->prepare("SELECT accountID FROM accounts WHERE userName=:userName AND isAdmin = 1");	
@@ -71,9 +70,7 @@ else if ($stage AND array_key_exists("levels", $_POST) == false)
 }
 else
 {
-	$ep = new exploitPatch();
-	$generatePass = new generatePass();
-	$pass = $generatePass->isValidUsrname($_POST["userName"], $_POST["password"]);
+	$pass = GeneratePass::isValidUsrname($_POST["userName"], $_POST["password"]);
 	if ($pass == 1)
 	{
 		$query = $db->prepare("SELECT accountID FROM accounts WHERE userName=:userName AND isAdmin = 1");	
@@ -90,11 +87,11 @@ else
 			exit("<p>Cannot find map pack, did you enter the name correctly?</p>");
 		}
 		
-		$packName = $ep->remove($_POST["packName"]);
-		$levels = $ep->remove($_POST["levels"]);
-		$stars = $ep->remove($_POST["stars"]);
-		$coins = $ep->remove($_POST["coins"]);
-		$color = $ep->remove($_POST["color"]);
+		$packName = ExploitPatch::remove($_POST["packName"]);
+		$levels = ExploitPatch::remove($_POST["levels"]);
+		$stars = ExploitPatch::remove($_POST["stars"]);
+		$coins = ExploitPatch::remove($_POST["coins"]);
+		$color = ExploitPatch::remove($_POST["color"]);
 		
 		if(!is_numeric($stars) OR !is_numeric($coins) OR $stars > 10 OR $coins > 2)
 		{

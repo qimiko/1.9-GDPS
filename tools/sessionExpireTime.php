@@ -13,8 +13,7 @@ if (array_key_exists('u', $_GET))
 	$query->execute([':u' => $u]);
 	$accid = $query->fetch()['accountID'];
 
-	$session = new accSession();
-	$init = $session->getTimeLeft($accid);
+	$init = AccSession::getTimeLeft($accid);
 
 	$hours = floor($init / 3600);
 	$minutes = floor(($init / 60) % 60);

@@ -1,24 +1,18 @@
 <?php
 chdir(dirname(__FILE__));
 //error_reporting(0);
-include "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
-$ep = new exploitPatch();
-$gjp = $ep->remove($_POST["gjp"]);
-$id = $ep->remove($_POST["accountID"]);
-if($id != "" AND $gjp != ""){
-	$GJPCheck = new GJPCheck();
-	$gjpresult = $GJPCheck->check($gjp,$id);
-	if($gjpresult == 1){
-		$query = $db->prepare("SELECT isAdmin FROM accounts WHERE accountID = :id");
-		$query->execute([':id' => $id]);
-		$isAdmin = $query->fetchColumn();
-		if($isAdmin==1){
-			echo 1;
-		}else{
-			echo -1;
-		}
-	}else{echo -1;}
-}else{echo -1;}
+require_once "../lib/mainLib.php"; //this is connection.php too
+$gs = new mainLib();
+
+$accountID = GJPCheck::getAccountIDOrDie();
+
+if ($gs->getMaxValuePermission($accountID,"actionRequestMod") >= 1) { // checks if they have mod
+	$permState = $gs->getMaxValuePermission($accountID,"modBadgeLevel"); // checks mod badge level so it knows what to show					   
+	if ($permState >= 2){ // if the mod badge level is higher than 2, it will still show elder mod message
+		exit("2");
+	}
+	echo $permState; 
+}
 ?>

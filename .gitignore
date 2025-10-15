@@ -49,3 +49,5 @@ php_errorlog*
 
 
 data/
+dashboard/incl/lang/dev/append.php
+dashboard/incl/lang/dev/append.txt

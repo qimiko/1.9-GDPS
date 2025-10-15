@@ -11,31 +11,22 @@
 			<h1>Level To GD</h1>
 <?php
 function chkarray($source){
-	if($source == ""){
-		$target = "0";
-	}else{
-		$target = $source;
-	}
-	return $target;
+	return $source == "" ? "0" : $target;
 }
 //error_reporting(0);
 include "../incl/lib/connection.php";
 require "../incl/lib/XORCipher.php";
-$xc = new XORCipher();
 require_once "../incl/lib/generatePass.php";
-$generatePass = new generatePass();
 require_once "../incl/lib/exploitPatch.php";
-$ep = new exploitPatch();
 require_once "../incl/lib/generateHash.php";
-$gh = new generateHash();
 if(!empty($_POST["userhere"]) AND !empty($_POST["passhere"]) AND !empty($_POST["usertarg"]) AND !empty($_POST["passtarg"]) AND !empty($_POST["levelID"])){
-	$userhere = $ep->remove($_POST["userhere"]);
-	$passhere = $ep->remove($_POST["passhere"]);
-	$usertarg = $ep->remove($_POST["usertarg"]);
-	$passtarg = $ep->remove($_POST["passtarg"]);
-	$levelID = $ep->remove($_POST["levelID"]);
+	$userhere = ExploitPatch::remove($_POST["userhere"]);
+	$passhere = ExploitPatch::remove($_POST["passhere"]);
+	$usertarg = ExploitPatch::remove($_POST["usertarg"]);
+	$passtarg = ExploitPatch::remove($_POST["passtarg"]);
+	$levelID = ExploitPatch::remove($_POST["levelID"]);
 	$server = trim($_POST["server"]);
-	$pass = $generatePass->isValidUsrname($userhere, $passhere);
+	$pass = GeneratePass::isValidUsrname($userhere, $passhere);
 	if ($pass != 1) { //verifying if valid local usr
 		exit("<p>Wrong local username/password combination</p>");
 	}
@@ -58,6 +49,7 @@ if(!empty($_POST["userhere"]) AND !empty($_POST["passhere"]) AND !empty($_POST["
 	$ch = curl_init($server . "/accounts/loginGJAccount.php");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+	curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 	$result = curl_exec($ch);
 	curl_close($ch);
 	if($result == "" OR $result == "-1" OR $result == "No no no"){
@@ -70,13 +62,14 @@ if(!empty($_POST["userhere"]) AND !empty($_POST["passhere"]) AND !empty($_POST["
 		}
 		exit("<p>Error code: $result</p>");
 	}
-	if(!is_numeric($levelID)){ //checking if lvlid is numeric cuz exploits
-		exit("<p>Invalid levelID</p>");
+	if(!is_numeric($levelID)){ //checking if the level id is numeric due to possible exploits
+		exit("Invalid levelID");
 	}
-	$levelString = file_get_contents("../data/levels/$levelID"); //generating seed2
-	$seed2 = base64_encode($xc->cipher($gh->genSeed2noXor($levelString),41274));
-	$accountID = explode(",",$result)[0]; //and finally reuploading
-	$gjp = base64_encode($xc->cipher($passtarg,37526));
+	//TODO: move all file_get_contents calls like this to a separate function
+	$levelString = file_get_contents("../data/levels/$levelID");
+	$seed2 = base64_encode(XORCipher::cipher(GenerateHash::genSeed2noXor($levelString),41274));
+	$accountID = explode(",",$result)[0];
+	$gjp = base64_encode(XORCipher::cipher($passtarg,37526));
 	$post = ['gameVersion' => $levelInfo["gameVersion"], 
 	'binaryVersion' => $levelInfo["binaryVersion"], 
 	'gdw' => "0", 
@@ -110,6 +103,7 @@ if(!empty($_POST["userhere"]) AND !empty($_POST["passhere"]) AND !empty($_POST["
 	curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS | CURLPROTO_HTTP);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+	curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS);
 	$result = curl_exec($ch);
 	curl_close($ch);
 	if($result == "" OR $result == "-1" OR $result == "No no no"){
@@ -124,24 +118,18 @@ if(!empty($_POST["userhere"]) AND !empty($_POST["passhere"]) AND !empty($_POST["
 	}
 	echo "<p>Level reuploaded - $result</p>";
 }else{
-	echo '<form action="" method="post">
-			<p><b>Your password for the target server is NOT saved, it\'s used for one-time verification purposes only.</b></p>
-			<h2>1.9 GDPS</h2>
-			<input class="smain" type="text" placeholder="Username" name="userhere"><br>
-			<input class="smain" type="password" placeholder="Password" name="passhere"><br>
-			<input class="smain" type="text" placeholder="LevelID" name="levelID"><br>
-			<h2>Target server</h2>
-			<input class="smain" class="smain" type="text" placeholder="Username" name="usertarg"><br>
-			<input class="smain" type="password" placeholder="Password" name="passtarg"><br>
-			<input class="smain" type="text" placeholder="URL" name="server" value="http://www.boomlings.com/database/"><br>
-			<input class="smain" type="text" placeholder="Debug Mode" name="debug" value="0"><br>
-			<hr />
-			<input class="smain" type="submit" value="Reupload">
-		</form>
-			<hr />
-			<p>Alternative servers to reupload to:</p>
-			<p>http://www.boomlings.com/database/ - Robtops server</p>
-			<p>http://pi.michaelbrabec.cz:9010/a/ - CvoltonGDPS</p>';
+	echo '<form action="levelToGD.php" method="post">Your password for the target server is NOT saved, it\'s used for one-time verification purposes only.
+	<h3>This server</h3>Username: <input type="text" name="userhere"><br>
+	Password: <input type="password" name="passhere"><br>
+	Level ID: <input type="text" name="levelID"><br>
+	<h3>Target server</h3>Username: <input type="text" name="usertarg"><br>
+	Password: <input type="password" name="passtarg"><br>
+	<details>
+		<summary>Advanced options</summary>
+		URL: <input type="text" name="server" value="http://www.boomlings.com/database/"><br>
+		Debug Mode (0=off, 1=on): <input type="text" name="debug" value="0"><br>
+	</details>
+	<input type="submit" value="Reupload"></form>';
 }
 ?>
 		</div>

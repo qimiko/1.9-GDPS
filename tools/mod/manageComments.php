@@ -46,8 +46,7 @@ if (!empty($_GET['id']))
 }
 else if (!empty($_POST['u']) and !empty($_POST['p']))
 {	
-	$generatePass = new generatePass();
-	$pass = $generatePass->isValidUsrname($_POST["u"], $_POST["p"]);
+	$pass = GeneratePass::isValidUsrname($_POST["u"], $_POST["p"]);
 	if ($pass == 1)
 	{
 		$query = $db->prepare("SELECT accountID FROM accounts WHERE userName=:userName AND isAdmin = 1");	

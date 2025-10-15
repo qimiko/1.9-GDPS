@@ -1,21 +1,21 @@
 <html>
-        <head>
-                <title>View Devices - 1.9 GDPS</title>
-                <?php include "../../../../incl/_style.php"; ?>
-        </head>
+	<head>
+		<title>View Devices - 1.9 GDPS</title>
+		<?php include "../../../../incl/_style.php"; ?>
+	</head>
 
-        <body>
-                <?php include "../../../../incl/_nav.php"; ?>
+	<body>
+		<?php include "../../../../incl/_nav.php"; ?>
 
-                <div class="smain">
+		<div class="smain">
 
-                        <h1>View Active Devices</h1>
+		<h1>View Active Devices</h1>
 
-                        <form action="" method="post">
-                                <input class="smain" type="text" placeholder="Username" name="u"><br>
-                                <input class="smain" type="password" placeholder="Password" name="p"><br>
-                                <input class="smain" type="submit" value="Go">
-                        </form>
+		<form action="" method="post">
+			<input class="smain" type="text" placeholder="Username" name="u"><br>
+			<input class="smain" type="password" placeholder="Password" name="p"><br>
+			<input class="smain" type="submit" value="Go">
+		</form>
 
 <?php
 
@@ -25,11 +25,10 @@ require "../../incl/lib/auth.php";
 
 if (!empty($_POST['u']) AND !empty($_POST['p']))
 {
-        $generatePass = new generatePass();
-        $pass = $generatePass->isValidUsrname($_POST['u'], $_POST['p']);
+	$pass = GeneratePass::isValidUsrname($_POST['u'], $_POST['p']);
 
-        if ($pass)
-        {
+	if ($pass)
+	{
 		$query = $db->prepare("SELECT auth.authkey, auth.accountid, auth.created, auth.ip, accounts.userName FROM auth INNER JOIN accounts ON auth.accountid=accounts.accountID WHERE accounts.userName=:username ORDER BY auth.created DESC");
 		$query->execute([':username' => $_POST['u']]);
 		$result = $query->fetchAll();
@@ -54,11 +53,11 @@ if (!empty($_POST['u']) AND !empty($_POST['p']))
 			$initialAuthkey = $result[0]['authkey'];
 			echo "<form method='POST' action=''><input type='hidden' name='authkey' value='$initialAuthkey' /><input type='hidden' name='mode' value='all' /><input type='submit' value='Log out of all devices' /></form>";
 		}
-        }
-        else
-        {
-                echo "INVALID USERNAME/PASSWORD.";
-        }
+	}
+	else
+	{
+		echo "INVALID USERNAME/PASSWORD.";
+	}
 } else if (!empty($_POST['authkey']) && !empty($_POST['mode'])) {
 	if ($_POST['mode'] == 'single') {
 		Auth::revoke_auth($_POST['authkey']);
@@ -70,6 +69,6 @@ if (!empty($_POST['u']) AND !empty($_POST['p']))
 }
 
 ?>
-                </div>
-        </body>
+		</div>
+	</body>
 </html>

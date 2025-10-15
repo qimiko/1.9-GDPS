@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 chdir(dirname(__FILE__));
 echo "<p>Please wait...</p>";
 ob_flush();
@@ -19,7 +20,6 @@ file_put_contents("../logs/fixcpslog.txt",time());
 if(function_exists("set_time_limit")) set_time_limit(0);
 $cplog = "";
 $people = array();
-$nocpppl = "";
 include "../../incl/lib/connection.php";
 //getting users
 $query = $db->prepare("UPDATE users
@@ -60,7 +60,7 @@ foreach($result as $level){
 		$deservedcp++;
 	}
 	if($level["starEpic"] != 0){
-		$deservedcp += 2;
+		$deservedcp += $level["starEpic"]; // Epic - 1, Legendary - 2, Mythic - 3
 	}
 	$query = $db->prepare("SELECT userID FROM cpshares WHERE levelID = :levelID");
 	$query->execute([':levelID' => $level["levelID"]]);
@@ -125,6 +125,5 @@ foreach($people as $user => $cp){
 	$query4->execute([':userID' => $user, ':creatorpoints' => $cp]);
 }
 echo "<hr>done";
-
 file_put_contents("../logs/cplog.txt",$cplog);
 ?>

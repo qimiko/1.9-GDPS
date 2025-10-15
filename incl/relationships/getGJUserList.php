@@ -1,23 +1,17 @@
 <?php
+//TODO: joins
 chdir(dirname(__FILE__));
 include "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
-$ep = new exploitPatch();
-$GJPCheck = new GJPCheck();
-if(empty($_POST["accountID"]) OR empty($_POST["gjp"]) OR (!isset($_POST["type"]) OR !is_numeric($_POST["type"]))){
+if(!isset($_POST["type"]) OR !is_numeric($_POST["type"])){
 	exit("-1");
 }
-$accountID = $ep->remove($_POST["accountID"]);
-$gjp = $ep->remove($_POST["gjp"]);
-$type = $ep->remove($_POST["type"]);
+$accountID = GJPCheck::getAccountIDOrDie();
+$type = ExploitPatch::remove($_POST["type"]);
 $people = "";
 $peoplestring = "";
-$gjpresult = $GJPCheck->check($gjp,$accountID);
 $new = array();
-if($gjpresult != 1){
-	exit("-1");
-}
 if($type == 0){
 	$query = "SELECT person1,isNew1,person2,isNew2 FROM friendships WHERE person1 = :accountID OR person2 = :accountID";
 }else if($type==1){
@@ -46,6 +40,7 @@ else
 	$query->execute();
 	$result = $query->fetchAll();
 	foreach($result as &$user){
+		$user['extID'] = is_numeric($user['extID']) ? $user['extID'] : 0;
 		$peoplestring .= "1:".$user["userName"].":2:".$user["userID"].":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":14:".$user["iconType"].":15:".$user["special"].":16:".$user["extID"].":18:0:41:".$new[$user["extID"]]."|";
 	}
 	$peoplestring = substr($peoplestring, 0, -1);

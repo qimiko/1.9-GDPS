@@ -27,8 +27,7 @@ require "../../incl/lib/webhooks/webhook.php";
 
 if (!empty($_POST['u']) AND !empty($_POST['p']) AND !empty($_POST['id']))
 {
-	$generatePass = new generatePass();
-	$pass = $generatePass->isValidUsrname($_POST['u'], $_POST['p']);
+	$pass = GeneratePass::isValidUsrname($_POST['u'], $_POST['p']);
 	
 	$q = $db->prepare("SELECT isAdmin FROM accounts WHERE userName = :un");
 	$q->execute([':un' => $_POST['u']]);

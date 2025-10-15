@@ -2,10 +2,17 @@
 
 chdir(dirname(__FILE__));
 
+include "../config/security.php";
 include "../incl/lib/connection.php";
 require_once "../incl/lib/exploitPatch.php";
-$ep = new exploitPatch();
-$ip = $_SERVER['REMOTE_ADDR'];
+require_once "../incl/lib/mainLib.php";
+
+$gs = new mainLib();
+$ip = $gs->getIP();
+
+if(!isset($preactivateAccounts)){
+	$preactivateAccounts = true;
+}
 
 if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email']))
 {
@@ -25,9 +32,9 @@ if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email
 	}
 	
 	//here im getting all the data
-	$userName = $ep->remove($_POST["username"]);
-	$password = $ep->remove($_POST["password"]);
-	$email = $ep->remove($_POST["email"]);
+	$userName = ExploitPatch::remove($_POST["username"]);
+	$password = ExploitPatch::remove($_POST["password"]);
+	$email = ExploitPatch::remove($_POST["email"]);
 	$secret = "";
 	//checking if name is taken
 	$query2 = $db->prepare("SELECT count(*) FROM accounts WHERE userName LIKE :userName");
@@ -49,10 +56,9 @@ if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email
 	else
 	{
 		$hashpass = password_hash($password, PASSWORD_DEFAULT);
-		$query = $db->prepare("INSERT INTO accounts (userName, password, email, secret, saveData, registerDate, saveKey, ip)
-		VALUES (:userName, :password, :email, :secret, '', :time, '', :ip)");
-		$query->execute([':userName' => $userName, ':password' => $hashpass, ':email' => $email, ':secret' => $secret, ':time' => time(), ':ip' => $ip]);
-		
+		$query2 = $db->prepare("INSERT INTO accounts (userName, password, email, registerDate, isActive, gjp2, ip)
+		VALUES (:userName, :password, :email, :time, :isActive, :gjp2, :ip)");
+		$query2->execute([':userName' => $username, ':password' => $hashpass, ':email' => $email,':time' => time(), ':isActive' => $preactivateAccounts ? 1 : 0, ':gjp2' => GeneratePass::GJP2hash($password), ':ip' => $ip]);
 		exit(json_encode(['success' => true, 'message' => 'Successfully registered account']));
 	}
 }

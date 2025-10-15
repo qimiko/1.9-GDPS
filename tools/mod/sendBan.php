@@ -15,18 +15,16 @@
     require "../../incl/lib/generatePass.php";
     require_once "../../incl/lib/exploitPatch.php";
     require "../../incl/lib/webhooks/webhook.php";
-    
-    $ep = new exploitPatch();
+
     if(!empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["AccountID"])){
         if(empty($_POST["reason"])){
             exit("Reason can't be empty.");
         }
-        $userName = $ep->remove($_POST["userName"]);
-        $password = $ep->remove($_POST["password"]);
-        $userID = $ep->remove($_POST["AccountID"]);
+        $userName = ExploitPatch::remove($_POST["userName"]);
+        $password = ExploitPatch::remove($_POST["password"]);
+        $userID = ExploitPatch::remove($_POST["AccountID"]);
         $reason = $_POST["reason"];
-        $generatePass = new generatePass();
-        $pass = $generatePass->isValidUsrname($userName, $password);
+        $pass = GeneratePass::isValidUsrname($userName, $password);
         if ($pass == 1) {
             $query = $db->prepare("SELECT accountID FROM accounts WHERE userName=:userName AND isAdmin = 1");
             $query->execute([':userName' => $userName]);

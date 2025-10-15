@@ -1,54 +1,39 @@
 <?php
 //credits to pavlukivan for decoding and to IAD for most of genSolo
-class generateHash {
-	public function genMulti($lvlsmultistring) {
-		return "";
-		$lvlsarray = explode(",", $lvlsmultistring);
+if(!function_exists("intdiv")) {
+	function intdiv($a, $b){
+		return ($a - $a % $b) / $b;
+	}
+}
+class GenerateHash {
+	public static function genMulti($lvlsmultistring) {
 		include dirname(__FILE__)."/connection.php";
 		$hash = "";
-		foreach($lvlsarray as $id){
-			//moving levels into the new system
-			if(!is_numeric($id)){
-				exit("-1");
-			}
-			$query=$db->prepare("SELECT levelString, levelID, starStars, starCoins FROM levels WHERE levelID = :id");
-			$query->execute([':id' => $id]);
-			$result2 = $query->fetchAll();
-			$result = $result2[0];
-			$levelString = $result["levelString"];
-			if(!file_exists(dirname(__FILE__)."/../../data/levels/$id")){
-				file_put_contents(dirname(__FILE__)."/../../data/levels/$id",$levelString);
-				$query = $db->prepare("UPDATE levels SET levelString = '' WHERE levelID = :levelID");
-				$query->execute([':levelID' => $id]);
-			}
-			//generating the hash
-			$str_levelid = (string)$result["levelID"];
-			$hash .= $str_levelid[0].$str_levelid[strlen($str_levelid)-1].$result["starStars"].$result["starCoins"];
+		foreach($lvlsmultistring as $result) {
+			$id = strval($result['levelID']);
+			$hash = $hash . $id[0].$id[strlen($id)-1].$result["stars"].$result["coins"];
 		}
 		return sha1($hash . "xI25fpAapCQg");
 	}
-	public function genSolo($levelstring) {
-		$hash = "aaaaa";
+	public static function genSolo($levelstring) {
 		$len = strlen($levelstring);
-		$divided = intval($len/40);
-		$p = 0;
-		for($k = 0; $k < $len ; $k= $k+$divided){
-			if($p > 39) break;
-			$hash[$p] = $levelstring[$k]; 
-			$p++;
-		}
-		return sha1($hash . "xI25fpAapCQg");
+		if($len < 41)return sha1("{$levelstring}xI25fpAapCQg");
+		$hash = '????????????????????????????????????????xI25fpAapCQg';
+		$m = intdiv($len, 40);
+		$i = 40;
+		while($i)$hash[--$i] = $levelstring[$i*$m];
+		return sha1($hash);
 	}
-	public function genSolo2($lvlsmultistring) {
+	public static function genSolo2($lvlsmultistring) {
 		return sha1($lvlsmultistring . "xI25fpAapCQg");
 	}
-	public function genSolo3($lvlsmultistring) {
+	public static function genSolo3($lvlsmultistring) {
 		return sha1($lvlsmultistring . "oC36fpYaPtdg");
 	}
-	public function genSolo4($lvlsmultistring){
+	public static function genSolo4($lvlsmultistring){
 		return sha1($lvlsmultistring . "pC26fpYaQCtg");
 	}
-	public function genPack($lvlsmultistring) {
+	public static function genPack($lvlsmultistring) {
 		$lvlsarray = explode(",", $lvlsmultistring);
 		include dirname(__FILE__)."/connection.php";
 		$hash = "";
@@ -57,11 +42,12 @@ class generateHash {
 			$query->execute([':id' => $id]);
 			$result2 = $query->fetchAll();
 			$result = $result2[0];
-			$hash = $hash . $result["ID"][0].$result["ID"][strlen($result["ID"])-1].$result["stars"].$result["coins"];
+			$idstring = strval($result["ID"]);
+			$hash = $hash . $idstring[0].$idstring[strlen($idstring)-1].$result["stars"].$result["coins"];
 		}
 		return sha1($hash . "xI25fpAapCQg");
 	}
-	public function genSeed2noXor($levelstring) {
+	public static function genSeed2noXor($levelstring) {
 		$hash = "aaaaa";
 		$len = strlen($levelstring);
 		$divided = intval($len/50);

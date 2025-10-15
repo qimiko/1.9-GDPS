@@ -15,8 +15,7 @@ require_once "../incl/lib/sessions.php";
 include "../incl/lib/connection.php";		
 
 if (!empty($_POST['userName']) AND !empty($_POST['password'])) {
-	$session = new accSession();
-	echo $session->newSession($_POST['userName'], $_POST['password']) ? "Success" : "Failed, checks the username and password combination is correct";
+	echo AccSession::newSession($_POST['userName'], $_POST['password']) ? "Success" : "Failed, checks the username and password combination is correct";
 } else {
 	echo '<form action="" method="post">
 			<input class="smain" type="text" placeholder="Username" name="userName"><br>

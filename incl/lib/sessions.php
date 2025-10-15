@@ -1,12 +1,15 @@
 <?php
-class accSession
+
+include_once dirname(__FILE__)."/mainLib.php";
+
+class AccSession
 {
-	public function newSession($userName, $pswd)
+	public static function newSession($userName, $pswd)
 	{
 		require_once dirname(__FILE__)."/generatePass.php";
 		include dirname(__FILE__)."/connection.php";
-		$passCheck = new generatePass();
-		if ($passCheck->isValidUsrname($userName, $pswd) != 1) { //if incorrect user/pass combination
+
+		if (GeneratePass::isValidUsrname($userName, $pswd) != 1) { //if incorrect user/pass combination
 			return 0;
 		}
 		
@@ -18,7 +21,9 @@ class accSession
 		$result = $query->fetch(); //table from SQL database
 		
 		$accID = $result["accountID"];
-		$ip = $_SERVER["REMOTE_ADDR"];
+
+		$gs = new mainLib();
+		$ip = $gs->getIP();
 		$sessionStart = time();
 		$sessionEnd = $sessionStart - 604800; //session timeout (1w)
 		
@@ -35,11 +40,13 @@ class accSession
 		return 1;
 	}
 	
-	public function newSessionId($accountID)
+	public static function newSessionId($accountID)
 	{
 		include dirname(__FILE__)."/connection.php";
-		
-		$ip = $_SERVER["REMOTE_ADDR"];
+
+		$gs = new mainLib();
+		$ip = $gs->getIP();
+
 		$sessionStart = time();
 		$sessionEnd = $sessionStart - 604800; //session timeout (1w)
 		
@@ -56,28 +63,34 @@ class accSession
 		return 1;
 	}
 	
-	public function checkSession($accID)
+	public static function checkSession($accID)
 	{
 		include dirname(__FILE__)."/connection.php";
-		
+
+		$gs = new mainLib();
+		$ip = $gs->getIP();
+
 		$sessionEnd = time() - 604800;
 		
 		$query = $db->prepare("SELECT accountID FROM accSessions WHERE accountID = :accID AND ip = :IP AND sessionStart > :timestamp");
-		$query->execute([':accID' => $accID, ':IP' => $_SERVER["REMOTE_ADDR"], ':timestamp' => $sessionEnd]);
+		$query->execute([':accID' => $accID, ':IP' => $ip, ':timestamp' => $sessionEnd]);
 		if ($query->rowCount() > 0) { //if session exists
 			return 1;
 		}
 		return 0; //oh no, no valid session has been found :(
 	}
 	
-	public function getTimeLeft($accID)
+	public static function getTimeLeft($accID)
 	{
 		include dirname(__FILE__)."/connection.php";
-		
+
+		$gs = new mainLib();
+		$ip = $gs->getIP();
+
 		$sessionEnd = time() - 604800;
 
 		$query = $db->prepare("SELECT sessionStart FROM accSessions WHERE accountID = :accID AND ip = :IP AND sessionStart > :timestamp");
-		$query->execute([':accID' => $accID, ':IP' => $_SERVER["REMOTE_ADDR"], ':timestamp' => $sessionEnd]);
+		$query->execute([':accID' => $accID, ':IP' => $ip, ':timestamp' => $sessionEnd]);
 		if ($query->rowCount() > 0)
 		{ //if session exists
 			return 604800 - (time() - $query->fetch()["sessionStart"]);

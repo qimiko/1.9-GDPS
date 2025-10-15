@@ -3,21 +3,14 @@ chdir(dirname(__FILE__));
 //error_reporting(0);
 include "../lib/connection.php";
 require_once "../lib/exploitPatch.php";
-$ep = new exploitPatch();
-
-$isVerify = $_POST['isVerify'];
-
-if (!is_numeric($_POST["page"]))
-{
-	exit("-1");
-}
-
-$page = $ep->remove($_POST["page"]);
+require "../lib/generateHash.php";
+$page = ExploitPatch::remove($_POST["page"]);
 $packpage = $page*10;
 $mappackstring = "";
 $lvlsmultistring = "";
 
-if ($isVerify)
+$isVerify = $_POST['isVerify'];
+if ($isVerify == '1')
 	$query = $db->prepare("SELECT ID,name,levels,stars,coins FROM `mappacks` ORDER BY `stars` ASC");
 else
 	$query = $db->prepare("SELECT colors2,rgbcolors,ID,name,levels,stars,coins,difficulty FROM `mappacks` ORDER BY `stars` ASC LIMIT 10 OFFSET $packpage");
@@ -51,7 +44,5 @@ if ($isVerify)
 else
 	echo "#".$totalpackcount.":".$packpage.":10";
 echo "#";
-require "../lib/generateHash.php";
-$hash = new generateHash();
-echo $hash->genPack($lvlsmultistring);
+echo GenerateHash::genPack($lvlsmultistring);
 ?>

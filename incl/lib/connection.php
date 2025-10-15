@@ -2,6 +2,8 @@
 //error_reporting(0);
 include dirname(__FILE__)."/../../config/connection.php";
 @header('Content-Type: text/html; charset=utf-8');
+if(!isset($port))
+	$port = 3306;
 try {
     $db = new PDO("mysql:dbname=$dbname", $username, $password, array(
     PDO::ATTR_PERSISTENT => true

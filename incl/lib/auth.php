@@ -17,10 +17,10 @@ class Auth
 	{
 		require_once dirname(__FILE__)."/generatePass.php";
 		include dirname(__FILE__)."/connection.php";
-		
+		require_once "../incl/lib/mainLib.php";
+
 		//validating username and password
-		$gp = new generatePass();
-		if ($gp->isValidUsrname($userName, $pswd) != 1)
+		if (GeneratePass::isValidUsrname($userName, $pswd) != 1)
 		{
 			return 1;
 		}
@@ -54,8 +54,11 @@ class Auth
 		}
 		
 		//inserting auth
+		$gs = new mainLib();
+		$ip = $gs->getIP();
+
 		$queryAdd = $db->prepare("INSERT INTO auth (accountid, authkey, created, ip) VALUES (:accountid, :authkey, :time, :ip)");
-		$queryAdd->execute([':accountid' => $accountid, ':authkey' => $authkey, ':time' => time(), ':ip' => $_SERVER['REMOTE_ADDR']]);
+		$queryAdd->execute([':accountid' => $accountid, ':authkey' => $authkey, ':time' => time(), ':ip' => $ip]);
 		
 		return $authkey;
 	}
@@ -75,7 +78,21 @@ class Auth
 
 		$query = $db->prepare('SELECT 1 FROM auth WHERE authkey = :authkey AND accountid = :accountid LIMIT 1');
 		$query->execute([':authkey' => $key, ':accountid' => $accountId]);
-                return (bool)$query->fetchColumn();
+		return (bool)$query->fetchColumn();
+	}
+
+	public static function get_auth_user($key)
+	{
+		include dirname(__FILE__)."/connection.php";
+
+		$query = $db->prepare('SELECT accountid FROM auth WHERE authkey = :authkey');
+		$query->execute([':authkey' => $key]);
+		if ($query->rowCount() == 0)
+		{
+			return -1;
+		}
+
+		return $query->fetchColumn();
 	}
 
 	public static function revoke_auth($key)
@@ -116,8 +133,7 @@ class Auth
 		include dirname(__FILE__)."/connection.php";
 		
 		//validating username and password
-		$gp = new generatePass();
-		if ($gp->isValidUsrname($userName, $pswd) != 1)
+		if (GeneratePass::isValidUsrname($userName, $pswd) != 1)
 		{
 			return 0;
 		}
@@ -150,8 +166,7 @@ class Auth
 		
 		$accountid = $query->fetch()["accountid"];
 		
-		$session = new accSession();
-		return $session->newSessionId($accountid);
+		return AccSession::newSessionId($accountid);
 	}
 }
 
