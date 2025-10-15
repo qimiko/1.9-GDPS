@@ -75,6 +75,9 @@ if($query3->rowCount() == 0) {
 			$result = "1~|~".$songid."~|~2~|~".$songname."~|~3~|~1234~|~4~|~".$songauthor."~|~5~|~6.69~|~6~|~~|~10~|~".$songurl."~|~7~|~~|~8~|~1";
 		}
 	}
+
+	// silly workaround for my workaround. remove it once u9.0.5 releases
+	str_replace(array('~|~14~|~0', '~|~14~|~1'), '', $result);
 	echo $result;
 	$reup = SongReup::reup($result);
 }else{
