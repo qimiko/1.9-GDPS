@@ -29,6 +29,10 @@ if(!is_numeric($accountID)){
 	exit("-1");
 }
 
+if (empty($saveData)) {
+	exit("-1");
+}
+
 $pass = 0;
 if(!empty($_POST["password"])) $pass = GeneratePass::isValid($accountID, $_POST["password"]);
 elseif(!empty($_POST["gjp2"])) $pass = GeneratePass::isGJP2Valid($accountID, $_POST["gjp2"]);
