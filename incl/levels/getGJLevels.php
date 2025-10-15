@@ -263,11 +263,22 @@ switch($type){
 		break;
 }
 //ACTUAL QUERY EXECUTION
-$querybase = "FROM levels LEFT JOIN songsCombined songs ON levels.songID = songs.ID OR levels.songID-4000000=songs.ID LEFT JOIN users ON levels.userID = users.userID $sugg $morejoins";
+$querybase = "FROM levels
+	LEFT JOIN songs ON levels.songID = songs.ID
+	LEFT JOIN reuploadSongs R on levels.songID=R.ID
+	LEFT JOIN users ON levels.userID = users.userID $sugg $morejoins";
 if(!empty($params)){
 	$querybase .= " WHERE (" . implode(" ) AND ( ", $params) . ")";
 }
-$query = "SELECT levels.*, songs.ID, songs.name, songs.authorID, songs.authorName, songs.size, songs.isDisabled, songs.download, users.userName, users.extID$sug $querybase";
+$query = "SELECT levels.*,
+	COALESCE(songs.ID, R.ID),
+	COALESCE(songs.name, R.name),
+	COALESCE(songs.authorID, R.authorID),
+	COALESCE(songs.authorName, R.authorName),
+	COALESCE(songs.size, R.size),
+	COALESCE(songs.isDisabled, R.isDisabled),
+	COALESCE(songs.download, R.download),
+	users.userName, users.extID$sug $querybase";
 if($order){
 	if($ordergauntlet){
 		$query .= "ORDER BY $order ASC";
