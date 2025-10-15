@@ -9,7 +9,7 @@ $mainLib = new mainLib();
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 //here im getting all the data
-$gjp2check = isset($_POST['gjp2']) ? $_POST['gjp2'] : $_POST['gjp'];
+$gjp2check = $_POST['gjp2'] ?? $_POST['gjp'] ?? '';
 $gjp = ExploitPatch::remove($gjp2check);
 $gameVersion = ExploitPatch::remove($_POST["gameVersion"]);
 $userName = ExploitPatch::charclean($_POST["userName"]);
