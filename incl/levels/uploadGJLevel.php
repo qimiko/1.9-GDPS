@@ -85,12 +85,20 @@ if(isset($_POST["password"])){
 
 // check if we're using an altid for a music library song
 if ($songID > 10000000) {
-	$query = $db->prepare("SELECT ID FROM reuploadSongs WHERE ID=:songid LIMIT 1");
-	$query->execute([':songid' => $songID-4000000]);
+	// first check if a music library song does exist
+	$query = $db->prepare("SELECT ID FROM songs WHERE ID=:songid LIMIT 1");
+	$query->execute([':songid' => $songID]);
 
-	$checkId = $query->fetchColumn();
-	if ($checkId) {
-		$songID = $checkId;
+	// if it doesn't, we can fallback to the reupload
+	$checkOriginalId = $query->fetchColumn();
+	if (!$checkOriginalId) {
+		$query = $db->prepare("SELECT ID FROM reuploadSongs WHERE ID=:songid LIMIT 1");
+		$query->execute([':songid' => $songID-4000000]);
+
+		$checkId = $query->fetchColumn();
+		if ($checkId) {
+			$songID = $checkId;
+		}
 	}
 }
 
