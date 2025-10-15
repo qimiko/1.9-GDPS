@@ -271,17 +271,13 @@ class mainLib {
 		include_once __DIR__ . "/exploitPatch.php";
 		include_once __DIR__ . "/GJPCheck.php";
 
-		if(!empty($_POST["udid"]) AND $_POST['gameVersion'] < 20 AND $unregisteredSubmissions) 
-		{
+		$gameVersion = isset($_POST['gameVersion']) ? ExploitPatch::remove($_POST["gameVersion"]) : 0;
+		if (!empty($_POST["accountID"]) AND $_POST["accountID"] != "0") {
+			$id = GJPCheck::getAccountIDOrDie();
+		} elseif(!empty($_POST["udid"]) AND $gameVersion < 20 AND $unregisteredSubmissions) {
 			$id = ExploitPatch::remove($_POST["udid"]);
 			if(is_numeric($id)) exit("-1");
-		}
-		elseif(!empty($_POST["accountID"]) AND $_POST["accountID"]!="0")
-		{
-			$id = GJPCheck::getAccountIDOrDie();
-		}
-		else
-		{
+		} else {
 			exit("-1");
 		}
 		return $id;
