@@ -31,3 +31,11 @@ CREATE VIEW songsCombined AS
   SELECT * FROM songs
   UNION ALL
   SELECT * FROM reuploadSongs;
+
+ALTER TABLE `reuploadSongs` ADD `altId` int(11) NOT NULL DEFAULT 0;
+ALTER TABLE `reuploadSongs` ADD INDEX `reuploadSongs_altId`(`altId`);
+
+UPDATE `reuploadSongs` SET altId = (CASE WHEN ID>=6000000 THEN ID+4000000 ELSE ID END);
+
+ALTER TABLE `reuploadSongs` ALTER COLUMN `altId` DROP DEFAULT;
+

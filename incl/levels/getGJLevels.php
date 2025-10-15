@@ -265,11 +265,13 @@ switch($type){
 //ACTUAL QUERY EXECUTION
 $querybase = "FROM levels
 	LEFT JOIN songs ON levels.songID = songs.ID
-	LEFT JOIN reuploadSongs R on levels.songID-4000000=R.ID OR levels.songID=R.ID
+	LEFT JOIN reuploadSongs R ON levels.songID=R.ID OR levels.songID=R.altId
 	LEFT JOIN users ON levels.userID = users.userID $sugg $morejoins";
 if(!empty($params)){
 	$querybase .= " WHERE (" . implode(" ) AND ( ", $params) . ")";
 }
+// while we do have a combined view, mysql is unable to use the indexes for this view for whatever reason
+// this makes things really slow!! we can do the work here
 $query = "SELECT levels.*,
 	COALESCE(songs.ID, R.ID) as ID,
 	COALESCE(songs.name, R.name) as name,
