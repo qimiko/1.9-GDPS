@@ -9,8 +9,7 @@ $packpage = $page*10;
 $mappackstring = "";
 $lvlsmultistring = "";
 
-$isVerify = $_POST['isVerify'];
-if ($isVerify == '1')
+if (!empty($_POST['isVerify']))
 	$query = $db->prepare("SELECT ID,name,levels,stars,coins FROM `mappacks` ORDER BY `stars` ASC");
 else
 	$query = $db->prepare("SELECT colors2,rgbcolors,ID,name,levels,stars,coins,difficulty FROM `mappacks` ORDER BY `stars` ASC LIMIT 10 OFFSET $packpage");
