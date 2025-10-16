@@ -98,39 +98,23 @@ if($type == "top" OR $type == "creators" OR $type == "relative"){
 
 if($type == "week")
 {
-	$starsgain = array();
 	$time = time() - 604800;
 	$xi = 0;
-	$query = $db->prepare("SELECT * FROM actions WHERE type = '9' AND timestamp > :time");
+	$query = $db->prepare("SELECT users.*, SUM(value) as starGain FROM actions
+		INNER JOIN users ON users.userID=actions.account
+		WHERE actions.type = '9' AND actions.timestamp > :time
+		AND users.isBanned=0 AND users.isRegistered=1
+		GROUP BY users.userID HAVING starGain > 0
+		ORDER BY starGain DESC LIMIT 100
+	");
 	$query->execute([':time' => $time]);
 	$result = $query->fetchAll();
-	foreach($result as &$gain)
+
+	foreach ($result as $user)
 	{
-		if(!empty($starsgain[$gain["account"]]))
-		{
-			$starsgain[$gain["account"]] += $gain["value"];
-		}
-		else
-		{
-			$starsgain[$gain["account"]] = $gain["value"];
-		}
-	}
-	arsort($starsgain);
-	foreach ($starsgain as $userID => $stars)
-	{
-		if ($stars == 0 or $xi >= 100)
-		{
-			break;
-		}
-		$query = $db->prepare("SELECT * FROM users WHERE userID = :userID");
-		$query->execute([':userID' => $userID]);
-		$user = $query->fetchAll()[0];
-		if($user["isBanned"] == 0 && $user["isRegistered"] == 1)
-		{
-			$xi++;
-			$extid = (is_numeric($user['extID']) || $accountID == $user['extID']) ? $user['extID'] : 0;
-			$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["stars"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"].":52:".$user["moons"]."|";
-		}
+		$xi++;
+		$extid = (is_numeric($user['extID']) || $accountID == $user['extID']) ? $user['extID'] : 0;
+		$lbstring .= "1:".$user["userName"].":2:".$user["userID"].":13:".$user["coins"].":17:".$user["userCoins"].":6:".$xi.":9:".$user["icon"].":10:".$user["color1"].":11:".$user["color2"].":51:".$user["color3"].":14:".$user["iconType"].":15:".$user["special"].":16:".$extid.":3:".$user["starGain"].":8:".round($user["creatorPoints"],0,PHP_ROUND_HALF_DOWN).":4:".$user["demons"].":7:".$extid.":46:".$user["diamonds"].":52:".$user["moons"]."|";
 	}
 }
 
