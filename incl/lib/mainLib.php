@@ -729,6 +729,9 @@ class mainLib {
 				return "-4";
 			$size = round($size / 1024 / 1024, 2);
 			$hash = "";
+
+			// db name limit is 100 characters
+			$name = substr($name, 0, 100);
 			$query = $db->prepare("INSERT INTO reuploadSongs (name, authorID, authorName, size, download, hash)
 			VALUES (:name, '9', :author, :size, :download, :hash)");
 			$query->execute([':name' => $name, ':download' => $song, ':author' => $author, ':size' => $size, ':hash' => $hash]);
