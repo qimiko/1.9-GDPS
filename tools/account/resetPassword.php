@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
 			$acc = $query->fetchAll()[0];
 			$newpass = $_POST['password'];
-			
+/*
 			if($cloudSaveEncryption == 1){
 				$accountID = $acc["accountID"];
 				$saveData = file_get_contents("../../data/accounts/$accountID");
@@ -149,6 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 					file_put_contents("../../data/accounts/keys/$accountID",$protected_key_encoded);
 				}
 			}
+*/
 			//creating pass hash
 			$passhash = password_hash($newpass, PASSWORD_DEFAULT);
 			$query = $db->prepare("UPDATE accounts SET password=:password, salt=:salt WHERE accountID=:accid");	

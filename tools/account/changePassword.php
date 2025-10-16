@@ -36,6 +36,8 @@ if ($pass == 1) {
 	$query = $db->prepare("SELECT accountID FROM accounts WHERE userName=:userName");	
 	$query->execute([':userName' => $userName]);
 	$accountID = $query->fetchColumn();
+
+	/*
 	$saveData = file_get_contents("../../data/accounts/$accountID");
 	if(file_exists("../../data/accounts/keys/$accountID")){
 		$protected_key_encoded = file_get_contents("../../data/accounts/keys/$accountID");
@@ -51,6 +53,7 @@ if ($pass == 1) {
 			file_put_contents("../../data/accounts/keys/$accountID","");
 		}
 	}
+	*/
 
 	$clearQuery = $db->prepare("DELETE auth FROM auth INNER JOIN accounts ON auth.accountid=accounts.accountID WHERE accounts.userName=:userName");
 	$clearQuery->execute([':userName' => $userName]);
