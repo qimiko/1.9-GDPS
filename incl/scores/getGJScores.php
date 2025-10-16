@@ -101,7 +101,7 @@ if($type == "week")
 	$time = time() - 604800;
 	$xi = 0;
 	$query = $db->prepare("SELECT users.*, SUM(value) as starGain,
-		GREATEST(SUM(value2)) as coinGain, GREATEST(SUM(value3), 0) as demonGain FROM actions
+		GREATEST(SUM(value2), 0) as coinGain, GREATEST(SUM(value3), 0) as demonGain FROM actions
 		INNER JOIN users ON users.userID=actions.account
 		WHERE actions.type = '9' AND actions.timestamp > :time
 		AND users.isBanned=0 AND users.isRegistered=1
