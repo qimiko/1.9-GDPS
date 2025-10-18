@@ -32,7 +32,7 @@ if($type == "top" OR $type == "creators" OR $type == "relative"){
 		$query->execute();
 	}
 	if($type == "creators"){
-		$query = $db->prepare("SELECT * FROM users WHERE isCreatorBanned = '0' AND creatorPoints > 0 ORDER BY creatorPoints DESC LIMIT 100");
+		$query = $db->prepare("SELECT * FROM users WHERE isCreatorBanned = '0' AND creatorPoints > 0 ORDER BY creatorPoints DESC LIMIT 250");
 		$query->execute();
 	}
 	if($type == "relative")
