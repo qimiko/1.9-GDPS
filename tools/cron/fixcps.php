@@ -60,7 +60,7 @@ foreach($result as $level){
 		$deservedcp++;
 	}
 	if($level["starEpic"] != 0){
-		$deservedcp += $level["starEpic"]; // Epic - 1, Legendary - 2, Mythic - 3
+		$deservedcp += $level["starEpic"] * 2; // Epic - 1, Legendary - 2, Mythic - 3
 	}
 	$query = $db->prepare("SELECT userID FROM cpshares WHERE levelID = :levelID");
 	$query->execute([':levelID' => $level["levelID"]]);
