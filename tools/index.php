@@ -31,7 +31,11 @@
 			</p>
 
 			<h2>Songs</h2>
-			<p><a href="songAdd.php">Song Reupload</a><a href="stats/songsList.php">Song List</a></p>
+			<p>
+				<a href="songAdd.php">Song Reupload</a>
+				<a href="mod/songEdit.php">Edit Song</a>
+				<a href="stats/songsList.php">Song List</a>
+			</p>
 			
 			<h2>Users</h2>
 			<p><a href="stats/getUserInfo.php">Search Users</a><a href="stats/starGains.php">Star Gains</a><a href="stats/top24h.php">Top 24h</a><a href="stats/topWeek.php">Top Week</a><a href="stats/noLogIn.php">Unused Accounts</a></p>
