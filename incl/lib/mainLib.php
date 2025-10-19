@@ -699,10 +699,46 @@ class mainLib {
 		$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('3', :value, :levelID, :timestamp, :id)");
 		$query->execute([':value' => $coins, ':timestamp' => time(), ':id' => $accountID, ':levelID' => $levelID]);
 	}
+
+	public function fixSongUrl($url) {
+		if (str_contains($url, 'www.dropbox.com')) {
+			return str_replace('www.dropbox.com', 'dl.dropboxusercontent.com', $url);
+		} elseif (preg_match('/drive\.google\.com\/file\/d\/(\S+)\/view/', $url, $matches)) {
+			$driveId = $matches[1];
+			return "https://drive.google.com/uc?export=download&id=$driveId";
+		}
+
+		return $url;
+	}
+
+	public function fixSongName($song) {
+		require_once __DIR__ . "/../../incl/lib/exploitPatch.php";
+
+		$name = ExploitPatch::remove(
+			urldecode(str_replace(
+				[".mp3",".webm",".mp4",".wav"], "", basename($song)
+			))
+		);
+
+		// clean dropbox urls
+		$name = explode('?rlkey', $name)[0];
+
+		// adjust for database limits
+		$name = substr(trim($name), 0, 100);
+
+		return $name;
+	}
+
 	public function songReupload($url){
 		require __DIR__ . "/../../incl/lib/connection.php";
 		require_once __DIR__ . "/../../incl/lib/exploitPatch.php";
-		$song = str_replace("www.dropbox.com","dl.dropboxusercontent.com",$url);
+
+		// these links are temporary...
+		if (str_contains($url, 'cdn.discordapp.com')) {
+			return '-2';
+		}
+
+		$song = $this->fixSongUrl($url);
 		if (filter_var($song, FILTER_VALIDATE_URL) == TRUE && substr($song, 0, 4) == "http") {
 			$song = str_replace(["?dl=0","?dl=1"],"",$song);
 			$song = trim($song);
@@ -721,7 +757,7 @@ class mainLib {
 				return "-3";
 			}
 
-			$name = ExploitPatch::remove(urldecode(str_replace([".mp3",".webm",".mp4",".wav"], "", basename($song))));
+			$name = $this->fixSongName($song);
 			$author = "Reupload";
 			$info = $this->getFileInfo($song);
 			$size = $info['size'];
@@ -731,7 +767,6 @@ class mainLib {
 			$hash = "";
 
 			// db name limit is 100 characters
-			$name = substr($name, 0, 100);
 			$query = $db->prepare("INSERT INTO reuploadSongs (name, authorID, authorName, size, download, hash)
 			VALUES (:name, '9', :author, :size, :download, :hash)");
 			$query->execute([':name' => $name, ':download' => $song, ':author' => $author, ':size' => $size, ':hash' => $hash]);

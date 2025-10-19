@@ -16,15 +16,17 @@
 include "../../incl/lib/connection.php";
 require_once "../../incl/lib/exploitPatch.php";
 require "../../incl/lib/generatePass.php";
+require_once "../../incl/lib/mainLib.php";
+$gs = new mainLib();
 
 $stage = !empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["songID"]);
 
-$baseForm = '<p>This tool is mod-only!</p><form action="" method="post">
-	<input class="smain" type="text" placeholder="Username" name="userName"><br>
-	<input class="smain" type="password" placeholder="Password" name="password"><br>
-	<input class="smain" type="text" placeholder="Song ID" name="songID"><br>
-	<input class="smain" type="submit" value="Load">
-</form>';
+$baseForm = "<p>This tool is mod-only!</p><form action='' method='post'>
+	<input class='smain' type='text' placeholder='Username' name='userName' value='{$_POST["userName"] ?? ''}'><br>
+	<input class='smain' type='password' placeholder='Password' name='password' value='{$_POST["password"] ?? ''}'><br>
+	<input class='smain' type='text' placeholder='Song ID' name='songID'><br>
+	<input class='smain' type='submit' value='Load'>
+</form>";
 
 if ($stage == false)
 {
@@ -85,7 +87,7 @@ else
 		$songID = ExploitPatch::number($_POST["songID"]);
 		$name = ExploitPatch::remove($_POST["songName"]);
 		$author = ExploitPatch::remove($_POST["songAuthor"]);
-		$download = ExploitPatch::remove($_POST["songDownload"]);
+		$download = $gs->fixSongUrl(ExploitPatch::remove($_POST["songDownload"]));
 
 		$query = $db->prepare("UPDATE reuploadSongs SET name=:name, authorName=:author, download=:download WHERE ID=:songID");
 		$query->execute([':name' => $name, ':author' => $author, ':download' => $download, ':songID' => $songID]);
