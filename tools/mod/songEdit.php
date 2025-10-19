@@ -21,9 +21,12 @@ $gs = new mainLib();
 
 $stage = !empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["songID"]);
 
+$username = $_POST["userName"] ?? '';
+$password = $_POST["password"] ?? '';
+
 $baseForm = "<p>This tool is mod-only!</p><form action='' method='post'>
-	<input class='smain' type='text' placeholder='Username' name='userName' value='{$_POST["userName"] ?? ''}'><br>
-	<input class='smain' type='password' placeholder='Password' name='password' value='{$_POST["password"] ?? ''}'><br>
+	<input class='smain' type='text' placeholder='Username' name='userName' value='$username'><br>
+	<input class='smain' type='password' placeholder='Password' name='password' value='$password'><br>
 	<input class='smain' type='text' placeholder='Song ID' name='songID'><br>
 	<input class='smain' type='submit' value='Load'>
 </form>";
