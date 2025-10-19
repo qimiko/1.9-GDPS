@@ -90,7 +90,7 @@ else
 		$songID = ExploitPatch::number($_POST["songID"]);
 		$name = ExploitPatch::remove($_POST["songName"]);
 		$author = ExploitPatch::remove($_POST["songAuthor"]);
-		$download = $gs->fixSongUrl(ExploitPatch::remove($_POST["songDownload"]));
+		$download = $gs->fixSongUrl($_POST["songDownload"]);
 
 		$query = $db->prepare("UPDATE reuploadSongs SET name=:name, authorName=:author, download=:download WHERE ID=:songID");
 		$query->execute([':name' => $name, ':author' => $author, ':download' => $download, ':songID' => $songID]);
