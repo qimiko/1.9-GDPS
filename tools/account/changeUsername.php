@@ -24,16 +24,24 @@ if($userName != "" AND $newusr != "" AND $password != ""){
 			exit("Username too long - 20 characters max. <a href='changeUsername.php'>Try again</a>");
 		$query = $db->prepare("SELECT count(*) FROM accounts WHERE userName = :newUserName");
 		$query->execute([":newUserName" => $newusr]);
-		if($query->fetchColumn() > 0) exit("Account with this nickname already exists!")
-		$query = $db->prepare("UPDATE accounts SET username=:newusr WHERE userName=:userName");	
+		if($query->fetchColumn() > 0) exit("<p>Account with this nickname already exists!</p>");
+
+		$query = $db->prepare("SELECT accountID FROM accounts WHERE userName=:userName");
+		$query->execute([':userName' => $userName]);
+		$accountId = $query->fetchColumn();
+
+		$query = $db->prepare("UPDATE accounts SET username=:newusr WHERE userName=:userName");
 		$query->execute([':newusr' => $newusr, ':userName' => $userName]);
 		if($query->rowCount()==0){
-			echo "Invalid password or nonexistant account. <a href=''>Try again</a>";
+			echo "Invalid password or nonexistent account. <a href=''>Try again</a>";
 		}else{
-			echo "Username changed. <a href='..'>Go back to tools</a>";
+			$query = $db->prepare('UPDATE users SET userName=:userName WHERE extID=:id');
+			$query->execute([':userName' => $userName, ':id' => $accountId]);
+
+			echo "<p>Username changed. Please refresh your login ingame to fully update your name.</p> <a href='..'>Go back to tools</a>";
 		}
 	}else{
-		echo "Invalid password or nonexistant account. <a href=''>Try again</a>";
+		echo "Invalid password or nonexistent account. <a href=''>Try again</a>";
 	}
 }else{
 	echo '<form action="" method="post">Old username: <input type="text" name="userName"><br>New username: <input type="text" name="newusr"><br>Password: <input type="password" name="password"><br><input type="submit" value="Change"></form>';
