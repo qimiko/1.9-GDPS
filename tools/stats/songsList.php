@@ -58,11 +58,15 @@ foreach($result as &$song)
 			</table><p>
 <?php
 if ($page > 0) {
-	echo "<a href='?searchPage=". $page-1 ."'>Prev Page</a> &bull; ";
+	echo "<a href='?searchPage=". $page-1 ."'>Prev Page</a>";
 }
 
 $pageMax = ($page + 1) * 500;
 if ($pageMax < $songCount) {
+	if ($page > 0) {
+		echo '&bull;'
+	}
+
 	echo "<a href='?searchPage=". $page+1 ."'>Next Page</a>";
 }
 ?>
