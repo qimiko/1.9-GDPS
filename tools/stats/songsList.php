@@ -27,18 +27,19 @@ $page = empty($_GET['searchPage']) ? 0 : (int)$_GET['searchPage'];
 
 if (!empty($_GET['searchName'])) {
 	$searchName = $_GET['searchName'];
-	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs WHERE name LIKE :query OR authorName LIKE :query OR ID=:base ORDER BY ID DESC LIMIT 500");
+	$query = $db->prepare("SELECT ID,name,download, COUNT(*) as songsCount FROM reuploadSongs WHERE name LIKE :query OR authorName LIKE :query OR ID=:base ORDER BY ID DESC LIMIT 500");
 	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
 	$query->execute([':query' => "%$searchName%", ':base' => $searchName]);
 } else {
-	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs ORDER BY ID DESC LIMIT 500 OFFSET :offs");
+	$query = $db->prepare("SELECT ID,name,download, COUNT(*) as songsCount FROM reuploadSongs ORDER BY ID DESC LIMIT 500 OFFSET :offs");
 	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
 	$query->execute();
 }
 
 $result = $query->fetchAll();
 
-echo "<p>Count: ".count($result).", Page: ".($page+1)."</p>";
+$songCount = empty($result) ? 0 : $result[0]['songsCount'];
+echo "<p>Count: $songCount, Page: ".($page+1)."</p>";
 
 foreach($result as &$song)
 {
@@ -53,7 +54,10 @@ if ($page > 0) {
 	echo "<a href='?searchPage=". $page-1 ."'>Prev Page</a> &bull; ";
 }
 
-echo "<a href='?searchPage=". $page+1 ."'>Next Page</a>";
+$pageMax = ($page + 1) * 500;
+if ($pageMax < $songCount) {
+	echo "<a href='?searchPage=". $page+1 ."'>Next Page</a>";
+}
 ?>
 		</p></div>
 	</body>
