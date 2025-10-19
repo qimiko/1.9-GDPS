@@ -64,7 +64,7 @@ if ($page > 0) {
 $pageMax = ($page + 1) * 500;
 if ($pageMax < $songCount) {
 	if ($page > 0) {
-		echo '&bull;'
+		echo '&bull;';
 	}
 
 	echo "<a href='?searchPage=". $page+1 ."'>Next Page</a>";
