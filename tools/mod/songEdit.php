@@ -88,19 +88,32 @@ else
 		}
 
 		$songID = ExploitPatch::number($_POST["songID"]);
-		$name = ExploitPatch::remove($_POST["songName"]);
-		$author = ExploitPatch::remove($_POST["songAuthor"]);
+
 		$download = $gs->fixSongUrl($_POST["songDownload"]);
+		if (!empty($_POST["songName"]) && !empty($_POST["songAuthor"])) {
+			$name = ExploitPatch::remove($_POST["songName"]);
+			$author = ExploitPatch::remove($_POST["songAuthor"]);
 
-		$query = $db->prepare("UPDATE reuploadSongs SET name=:name, authorName=:author, download=:download WHERE ID=:songID");
-		$query->execute([':name' => $name, ':author' => $author, ':download' => $download, ':songID' => $songID]);
-
-		if ($query->rowCount() == 0) {
-			$query = $db->prepare("UPDATE songs SET name=:name, authorName=:author, download=:download WHERE ID=:songID");
+			$query = $db->prepare("UPDATE reuploadSongs SET name=:name, authorName=:author, download=:download WHERE ID=:songID");
 			$query->execute([':name' => $name, ':author' => $author, ':download' => $download, ':songID' => $songID]);
-		}
 
-		echo "$baseForm <p>Song $songID edited.</p>";
+			if ($query->rowCount() == 0) {
+				$query = $db->prepare("UPDATE songs SET name=:name, authorName=:author, download=:download WHERE ID=:songID");
+				$query->execute([':name' => $name, ':author' => $author, ':download' => $download, ':songID' => $songID]);
+			}
+
+			echo "$baseForm <p>Song $songID edited.</p>";
+		} else {
+			$query = $db->prepare("UPDATE reuploadSongs SET download=:download WHERE ID=:songID");
+			$query->execute([':download' => $download, ':songID' => $songID]);
+
+			if ($query->rowCount() == 0) {
+				$query = $db->prepare("UPDATE songs SET download=:download WHERE ID=:songID");
+				$query->execute([':download' => $download, ':songID' => $songID]);
+			}
+
+			echo "$baseForm <p>Song $songID download link edited.</p>";
+		}
 	}
 }
 ?>
