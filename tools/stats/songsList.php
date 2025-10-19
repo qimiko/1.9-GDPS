@@ -29,7 +29,7 @@ if (!empty($_GET['searchName'])) {
 	$searchName = $_GET['searchName'];
 	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs WHERE name LIKE :query OR authorName LIKE :query OR ID=:base ORDER BY ID DESC LIMIT 500");
 	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
-	$query->execute([':query' => "%$searchName%", ':base' => searchName]);
+	$query->execute([':query' => "%$searchName%", ':base' => $searchName]);
 } else {
 	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs ORDER BY ID DESC LIMIT 500 OFFSET :offs");
 	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
