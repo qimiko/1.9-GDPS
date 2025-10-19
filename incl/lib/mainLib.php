@@ -714,14 +714,13 @@ class mainLib {
 	public function fixSongName($song) {
 		require_once __DIR__ . "/../../incl/lib/exploitPatch.php";
 
+		$songFilename = basename(parse_url($song, PHP_URL_PATH));
+
 		$name = ExploitPatch::remove(
 			urldecode(str_replace(
-				[".mp3",".webm",".mp4",".wav"], "", basename($song)
+				[".mp3",".webm",".mp4",".wav"], "", $songFilename
 			))
 		);
-
-		// clean dropbox urls
-		$name = explode('?rlkey', $name)[0];
 
 		// adjust for database limits
 		$name = substr(trim($name), 0, 100);
