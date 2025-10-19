@@ -35,7 +35,7 @@ if ($stage == false)
 {
 	echo $baseForm;
 }
-else if ($stage AND empty($_POST["songName"]))
+else if ($stage AND empty($_POST["songDownload"]))
 {
 	$pass = GeneratePass::isValidUsrname($_POST["userName"], $_POST["password"]);
 	if ($pass == 1)
