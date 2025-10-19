@@ -23,18 +23,22 @@
 //error_reporting(0);
 include "../../incl/lib/connection.php";
 
+$page = empty($_GET['searchPage']) ? 0 : (int)$_GET['searchPage'];
+
 if (!empty($_GET['searchName'])) {
 	$searchName = $_GET['searchName'];
-	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs WHERE name LIKE :query ORDER BY ID DESC");
+	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs WHERE name LIKE :query ORDER BY ID DESC LIMIT 500");
+	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
 	$query->execute([':query' => "%$searchName%"]);
 } else {
-	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs ORDER BY ID DESC");
+	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs ORDER BY ID DESC LIMIT 500 OFFSET :offs");
+	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
 	$query->execute();
 }
 
 $result = $query->fetchAll();
 
-echo "<p>Count: ".count($result)."</p>";
+echo "<p>Count: ".count($result).", Page: ".($page+1)."</p>";
 
 foreach($result as &$song)
 {
@@ -43,7 +47,14 @@ foreach($result as &$song)
 	echo "<tr><td>".$song["ID"]."</td><td>".htmlspecialchars($song["name"],ENT_QUOTES)."</td><td><a href='".htmlspecialchars($song['download'])."'>".htmlspecialchars($songHostname)."</a></td></tr>";
 }//4115655
 ?>
-			</table>
-		</div>
+			</table><p>
+<?php
+if ($page > 0) {
+	echo "<a href='?searchPage=". $page-1 ."'>Prev Page</a> &bull; ";
+}
+
+echo "<a href='?searchPage=". $page+1 ."'>Next Page</a>";
+?>
+		</p></div>
 	</body>
 </html>
