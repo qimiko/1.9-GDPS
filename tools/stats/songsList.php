@@ -27,18 +27,25 @@ $page = empty($_GET['searchPage']) ? 0 : (int)$_GET['searchPage'];
 
 if (!empty($_GET['searchName'])) {
 	$searchName = $_GET['searchName'];
-	$query = $db->prepare("SELECT ID,name,download, COUNT(*) as songsCount FROM reuploadSongs WHERE name LIKE :query OR authorName LIKE :query OR ID=:base ORDER BY ID DESC LIMIT 500");
+	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs WHERE name LIKE :query OR authorName LIKE :query OR ID=:base ORDER BY ID DESC LIMIT 500");
 	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
 	$query->execute([':query' => "%$searchName%", ':base' => $searchName]);
+
+	$countQuery = $db->prepare("SELECT COUNT(*) FROM reuploadSongs WHERE name LIKE :query OR authorName LIKE :query OR ID=:base");
+	$countQuery->execute([':query' => "%$searchName%", ':base' => $searchName]);
+
 } else {
-	$query = $db->prepare("SELECT ID,name,download, COUNT(*) as songsCount FROM reuploadSongs ORDER BY ID DESC LIMIT 500 OFFSET :offs");
+	$query = $db->prepare("SELECT ID,name,download FROM reuploadSongs ORDER BY ID DESC LIMIT 500 OFFSET :offs");
 	$query->bindValue(':offs', $page * 500, PDO::PARAM_INT);
 	$query->execute();
+
+	$countQuery = $db->prepare("SELECT COUNT(*) FROM reuploadSongs");
+	$countQuery->execute();
 }
 
 $result = $query->fetchAll();
 
-$songCount = empty($result) ? 0 : $result[0]['songsCount'];
+$songCount = $countQuery->fetchColumn();
 echo "<p>Count: $songCount, Page: ".($page+1)."</p>";
 
 foreach($result as &$song)
