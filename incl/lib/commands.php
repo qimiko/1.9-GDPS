@@ -194,7 +194,7 @@ class Commands {
 				rename(dirname(__FILE__)."../../data/levels/$levelID",dirname(__FILE__)."../../data/levels/deleted/$levelID");
 			}
 
-			// PostToHook("Command - Delete", "$uname deleted $aLevelName by $aUserName (x-$levelID).\nReason: $rateReason", 0x800000);
+			PostToHook("Command - Delete", "$uname deleted a level by $aUserName (x-$levelID).\nReason: $rateReason", 0x800000);
 
 			return true;
 		}

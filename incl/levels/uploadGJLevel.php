@@ -105,6 +105,14 @@ if ($songID > 10000000) {
 $id = $gs->getIDFromPost();
 $hostname = $gs->getIP();
 $userID = $mainLib->getUserID($id, $userName);
+
+// check creator ban
+$query = $db->prepare("SELECT 1 FROM users WHERE isCreatorBanned=1 AND userID=:userID");
+$query->execute([':userID' => $userID]);
+if ($query->fetchColumn() > 0) {
+	exit('-1');
+}
+
 $uploadDate = time();
 $query = $db->prepare("SELECT count(*) FROM levels WHERE uploadDate > :time AND (userID = :userID OR hostname = :ip)");
 $query->execute([':time' => $uploadDate - 60, ':userID' => $userID, ':ip' => $hostname]);
