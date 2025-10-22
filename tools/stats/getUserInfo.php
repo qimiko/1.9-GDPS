@@ -26,7 +26,7 @@ if (!empty($_GET['u']))
 		exit("<p>Username must be at least 2 characters</p>");
 	}
 	
-	$query = $db->prepare("SELECT * FROM users WHERE userName LIKE CONCAT('%', :uName, '%') OR extID IN (SELECT accountID FROM accounts WHERE userName LIKE CONCAT('%', :uName, '%'))");
+	$query = $db->prepare("SELECT * FROM users WHERE userName LIKE CONCAT('%', :uName, '%') OR extID IN (SELECT accountID FROM accounts WHERE userName LIKE CONCAT('%', :uName, '%')) OR userID=:uName");
 	$query->execute([':uName' => $_GET['u']]);
 	$users = $query->fetchAll();
 
