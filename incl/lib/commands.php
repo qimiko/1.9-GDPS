@@ -89,7 +89,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('14', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => '1', ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
-			PostToHook("Command - NoCP", "$uname set $aLevelName by $aUserName ($levelID) to give no creator points.", 0x800000);
+			PostToActions("Command - NoCP", "$uname set $aLevelName by $aUserName ($levelID) to give no creator points.", 0x800000);
 
 			return true;
 		}
@@ -98,7 +98,7 @@ class Commands {
 			$query->execute([':levelID' => $levelID]);
 			$query = $db->prepare("INSERT INTO modactions (type, value, value3, timestamp, account) VALUES ('14', :value, :levelID, :timestamp, :id)");
 			$query->execute([':value' => '0', ':timestamp' => $uploadDate, ':id' => $accountID, ':levelID' => $levelID]);
-			PostToHook("Command - GiveCP", "$uname set $aLevelName by $aUserName ($levelID) to give creator points.", 0x008000);
+			PostToActions("Command - GiveCP", "$uname set $aLevelName by $aUserName ($levelID) to give creator points.", 0x008000);
 
 			return true;
 		}
@@ -194,7 +194,7 @@ class Commands {
 				rename(dirname(__FILE__)."../../data/levels/$levelID",dirname(__FILE__)."../../data/levels/deleted/$levelID");
 			}
 
-			PostToHook("Command - Delete", "$uname deleted a level by $aUserName (x-$levelID).\nReason: $rateReason", 0x800000);
+			PostToActions("Command - Delete", "$uname deleted a level by $aUserName (x-$levelID).\nReason: $rateReason", 0x800000);
 
 			return true;
 		}

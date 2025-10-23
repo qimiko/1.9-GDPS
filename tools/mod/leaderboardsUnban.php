@@ -38,7 +38,7 @@ if(!empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["
 			$query->execute([':id' => $userID, ':reason' => "Unbanned"]);
 			if($query->rowCount() != 0)
 			{
-				PostToHook("Leaderboard Unban", "User $userID has been unbanned with reason: \"$reason\".", 0x00FF00);
+				PostToActions("Leaderboard Unban", "User $userID has been unbanned with reason: \"$reason\".", 0x00FF00);
 				echo "<p>Unbanned succesfully</p>";
 			}else{
 				echo "<p>Unban failed</p>";

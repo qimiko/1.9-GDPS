@@ -9,4 +9,6 @@ $webhookUrl = "";
 
 // used for sends
 $webhookUrlAlt = "";
+
+$webhookUrlActions = '';
 ?>

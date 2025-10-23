@@ -51,11 +51,11 @@ if (!empty($_POST['u']) AND !empty($_POST['p']) AND !empty($_POST['id']))
 					
 					if ($_POST['ban'] != "0")
 					{
-						PostToHook("Account Update", "An account has been limited.");
+						PostToActions("Account Update", "An account has been limited.");
 					}
 					else
 					{
-						PostToHook("Account Update", "Account limitation has been removed.");
+						PostToActions("Account Update", "Account limitation has been removed.");
 					}
 			
 					echo "SUCCESS. User affected.";

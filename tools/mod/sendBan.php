@@ -38,7 +38,7 @@
                 $query->execute([':id' => $userID]);
                 if($query->rowCount() != 0)
                 {
-                    PostToHook("Send Ban", "Account $userID has been send banned with reason: \"$reason\".", 0xFF0000);
+                    PostToActions("Send Ban", "Account $userID has been send banned with reason: \"$reason\".", 0xFF0000);
                     echo "<p>Banned succesfully</p>";
                 }else{
                     echo "<p>Ban failed</p>";

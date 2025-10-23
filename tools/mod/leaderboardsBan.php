@@ -38,7 +38,7 @@ if(!empty($_POST["userName"]) AND !empty($_POST["password"]) AND !empty($_POST["
 			$query->execute([':id' => $userID, ':reason' => htmlspecialchars($reason)]);
 			if($query->rowCount() != 0)
 			{
-				PostToHook("Leaderboard Ban", "User $userID has been banned with reason: \"$reason\".", 0xFF0000);
+				PostToActions("Leaderboard Ban", "User $userID has been banned with reason: \"$reason\".", 0xFF0000);
 				echo "<p>Banned succesfully</p>";
 			}else{
 				echo "<p>Ban failed</p>";
