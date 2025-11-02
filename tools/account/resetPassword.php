@@ -152,13 +152,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 */
 			//creating pass hash
 			$salt = '';
+			$accid = $acc['accountID'];
 			$passhash = password_hash($newpass, PASSWORD_DEFAULT);
 			$query = $db->prepare("UPDATE accounts SET password=:password, salt=:salt WHERE accountID=:accid");	
-			$query->execute([':password' => $passhash, ':accid' => $acc["accountID"], ':salt' => $salt]);
+			$query->execute([':password' => $passhash, ':accid' => $accid, ':salt' => $salt]);
 			GeneratePass::assignGJP2($accid, $newpass);
 
 			$clearQuery = $db->prepare("DELETE FROM auth WHERE accountid=:accid");
-			$clearQuery->execute([':accid' => $acc["accountID"]]);
+			$clearQuery->execute([':accid' => $accid]);
 			echo "<p class=\"nobox\">Password changed. <a href='accountManagement.php'>Account management</a></p>";
 		}
 	}
