@@ -75,12 +75,9 @@ if($type == "top" OR $type == "creators" OR $type == "relative"){
 	if($type == "relative"){
 		$user = $result[0];
 		$extid = $user["extID"];
-		$e = "SET @rownum := 0;";
-		$query = $db->prepare($e);
-		$query->execute();
 		$f = "SELECT rank, stars FROM (
-							SELECT @rownum := @rownum + 1 AS rank, stars, extID, isBanned
-							FROM users WHERE isBanned = '0' AND isRegistered = '1' ORDER BY stars DESC
+							SELECT ROW_NUMBER() OVER (ORDER BY stars DESC) AS rank, stars, extID, isBanned
+							FROM users WHERE isBanned = '0' ORDER BY stars DESC
 							) as result WHERE extID=:extid";
 		$query = $db->prepare($f);
 		$query->execute([':extid' => $extid]);
