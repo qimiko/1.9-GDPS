@@ -25,6 +25,8 @@ $feaID = 0;
 if(!is_numeric($levelID)){
 	echo -1;
 }else{
+	$daily = 0;
+/*
 	switch($levelID){
 		case -1: //Daily level
 			$query = $db->prepare("SELECT feaID, levelID FROM dailyfeatures WHERE timestamp < :time AND type = 0 ORDER BY timestamp DESC LIMIT 1");
@@ -55,6 +57,7 @@ if(!is_numeric($levelID)){
 		default:
 			$daily = 0;
 	}
+*/
 	//downloading the level
 	if($daily == 1)
 		$query=$db->prepare("SELECT levels.*, users.userName, users.extID FROM levels LEFT JOIN users ON levels.userID = users.userID WHERE levelID = :levelID");
