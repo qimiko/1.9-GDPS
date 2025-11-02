@@ -8,6 +8,10 @@ $query = "SELECT * FROM users WHERE isCreatorBanned = '0' ORDER BY creatorPoints
 $query = $db->prepare($query);
 $query->execute();
 $result = $query->fetchAll();
+
+$pplstring = '';
+$xi = 0;
+
 foreach($result as &$user){
 	$xi++;
 	$extid = (is_numeric($user['extID']) || $accountID == $user['extID']) ? $user['extID'] : 0;
