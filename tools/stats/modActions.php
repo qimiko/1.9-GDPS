@@ -24,7 +24,7 @@ function formatUser($db, $mod) {
 	$query = $db->prepare("SELECT count(*) FROM modactions WHERE account = :id AND type = '1'");
 	$query->execute([':id' => $mod["accountID"]]);
 	$lvlcount = $query->fetchColumn();
-	echo "<tr><td>${mod["userName"]}</td><td>${mod["accountID"]}</td><td>${actionscount}</td><td>${lvlcount}</td><td>${time}</td></tr>";
+	echo "<tr><td>${mod["userName"]}</td><td>${mod["accountID"]}</td><td>${actionscount}</td><td>${lvlcount}</td></tr>";
 }
 
 $gs = new mainLib();
