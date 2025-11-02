@@ -3,7 +3,7 @@ chdir(dirname(__FILE__));
 include "../lib/connection.php";
 require_once "../lib/exploitPatch.php";
 $str = ExploitPatch::remove($_POST["str"]);
-$page = ExploitPatch::remove($_POST["page"]);
+$page = !empty($_POST["page"]) ? (int)ExploitPatch::number($_POST["page"]) : 0;
 $userstring = "";
 $usrpagea = $page*10;
 $query = "SELECT userName, userID, coins, userCoins, icon, color1, color2, color3, iconType, special, extID, stars, creatorPoints, demons, diamonds, moons FROM users WHERE userID = :str OR userName LIKE CONCAT('%', :str, '%') ORDER BY stars DESC LIMIT 10 OFFSET $usrpagea";

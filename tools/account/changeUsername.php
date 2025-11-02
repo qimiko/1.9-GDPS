@@ -14,10 +14,11 @@ include "../../incl/lib/connection.php";
 require "../../incl/lib/generatePass.php";
 require_once "../../incl/lib/exploitPatch.php";
 //here im getting all the data
-$userName = ExploitPatch::remove($_POST["userName"]);
-$newusr = ExploitPatch::remove($_POST["newusr"]);
-$password = ExploitPatch::remove($_POST["password"]);
-if($userName != "" AND $newusr != "" AND $password != ""){
+if(!empty($_POST["userName"]) && !empty($_POST["newusr"]) && !empty($_POST["password"])){
+	$userName = ExploitPatch::remove($_POST["userName"]);
+	$newusr = ExploitPatch::remove($_POST["newusr"]);
+	$password = ExploitPatch::remove($_POST["password"]);
+
 	$pass = GeneratePass::isValidUsrname($userName, $password);
 	if ($pass == 1) {
 		if(strlen($newusr) > 20)

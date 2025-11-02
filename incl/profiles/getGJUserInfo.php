@@ -6,6 +6,10 @@ require_once "../lib/GJPCheck.php";
 require_once "../lib/mainLib.php";
 $gs = new mainLib();
 
+if (empty($_POST["targetAccountID"])) {
+	exit('-1');
+}
+
 $appendix = "";
 $extid = ExploitPatch::number($_POST["targetAccountID"]);
 $me = !empty($_POST["accountID"]) ? GJPCheck::getAccountIDOrDie() : 0;

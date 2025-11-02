@@ -19,23 +19,25 @@ include_once "../../incl/lib/defuse-crypto.phar";
 use Defuse\Crypto\KeyProtectedByPassword;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
+$salt = "";
+if(!empty($_POST["userName"]) && !empty($_POST["oldpassword"]) && !empty($_POST["newpassword"])){
 $userName = ExploitPatch::remove($_POST["userName"]);
 $oldpass = $_POST["oldpassword"];
 $newpass = $_POST["newpassword"];
-$salt = "";
-if($userName != "" AND $newpass != "" AND $oldpass != ""){
 $pass = GeneratePass::isValidUsrname($userName, $oldpass);
 if ($pass == 1) {
 	//creating pass hash
 	$passhash = password_hash($newpass, PASSWORD_DEFAULT);
 	$query = $db->prepare("UPDATE accounts SET password=:password, salt=:salt WHERE userName=:userName");	
 	$query->execute([':password' => $passhash, ':userName' => $userName, ':salt' => $salt]);
-	GeneratePass::assignGJP2($accid, $newpass);
+
 	echo "Password changed. <a href='..'>Go back to tools</a>";
 	//decrypting save
 	$query = $db->prepare("SELECT accountID FROM accounts WHERE userName=:userName");	
 	$query->execute([':userName' => $userName]);
 	$accountID = $query->fetchColumn();
+
+	GeneratePass::assignGJP2($accountID, $newpass);
 
 	/*
 	$saveData = file_get_contents("../../data/accounts/$accountID");
