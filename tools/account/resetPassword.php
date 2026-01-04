@@ -187,7 +187,7 @@ else if ($_SERVER['REQUEST_METHOD'] == 'GET')
 				$isFirst = false;
 			}
 
-			echo '<form action="/gdapi/tools/account/resetPassword2.php" method="post">
+			echo '<form action="/gdapi/tools/account/resetPassword.php" method="post">
 Select account to reset: <p> ' . $accounts . ' </p>
 <input type="password" name="password" placeholder="New Password" required> <br />
 <input type="hidden" id="k" name="k" value="' . $_GET['k'] . '"> <br />
