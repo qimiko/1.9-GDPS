@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
 	if (array_key_exists('email', $_POST))
 	{
-		$query = $db->prepare("SELECT email, accountID, userName, passwordResetKey, passwordResetTime FROM accounts WHERE email=:email");
+		$query = $db->prepare("SELECT email, accountID, userName, passwordResetKey, passwordResetTime FROM accounts WHERE email=:email LIMIT 1");
 		$query->execute([':email' => $_POST['email']]);
 
 		if ($query->rowCount() == 0)
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		}
 		else
 		{
-			$acc = $query->fetchAll()[0];
+			$acc = $query->fetch();
 			
 			//rate limit emails
 			if ($acc['passwordResetTime'] > time() - 10 * 60)
@@ -62,18 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			}
 			else //send email
 			{
-				if ($acc['passwordResetKey'] == '')
-				{
-					$acc['passwordResetKey'] = hash("sha256", random_bytes(16) . $acc['email']);
+				$acc['passwordResetKey'] = hash("sha256", random_bytes(16) . $acc['email']);
 
-					$query = $db->prepare("UPDATE accounts SET passwordResetKey = :prk, passwordResetTime = :prt WHERE accountID = :accid");
-					$query->execute([':prk' => $acc['passwordResetKey'], ':prt' => time(), ':accid' => $acc['accountID']]);
-				}
-				else
-				{
-					$query = $db->prepare("UPDATE accounts SET passwordResetTime = :prt WHERE accountID = :accid");
-					$query->execute([':prt' => time(), ':accid' => $acc['accountID']]);
-				}
+				$query = $db->prepare("UPDATE accounts SET passwordResetKey = :prk, passwordResetTime = :prt WHERE email = :email");
+				$query->execute([':prk' => $acc['passwordResetKey'], ':prt' => time(), ':email' => $acc['email']]);
 
 				$email = new PHPMailer(true);
 				$email->isSMTP();
@@ -98,19 +90,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 					$response = $email->send();
 					echo "<p>Success, check your email to continue. If you don't receive an email after 10 minutes, try again</p>";
 				} catch (Exception $e) {
-                                        $query = $db->prepare("UPDATE accounts SET passwordResetTime = 0 WHERE accountID = :accid");
-                                        $query->execute([':accid' => $acc['accountID']]);
+					$query = $db->prepare("UPDATE accounts SET passwordResetTime = 0 WHERE email = :email");
+					$query->execute([':email' => $acc['email']]);
 
 					echo "<p>Failed to send email, please contact @qimiko on Discord<br/>" . $e->getMessage() . "</p><a href=\"javascript:history.back()\">Back</a>";
 				}
 			}
 		}
 	}
-	else if (array_key_exists('k', $_POST) && array_key_exists('password', $_POST))
+	else if (!empty($_POST['k']) && !empty(trim($_POST['k'])) && !empty($_POST['password']) && !empty($_POST['accountID']))
 	{
-		$query = $db->prepare("SELECT email, accountID, userName FROM accounts WHERE passwordResetKey=:prk");
-		$query->execute([':prk' => $_POST['k']]);
-		
+		// check key here, prevent someone overwriting it for fun
+		$query = $db->prepare("SELECT email, accountID, userName FROM accounts WHERE passwordResetKey=:prk AND accountID=:accountID LIMIT 1");
+		$query->execute([':prk' => $_POST['k'], ':accountID' => $_POST['accountID']]);
+
 		//check password valid
 		if ($query->rowCount() == 0)
 		{
@@ -126,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		}
 		else //reset password
 		{
-			$acc = $query->fetchAll()[0];
+			$acc = $query->fetch();
 			$newpass = $_POST['password'];
 /*
 			if($cloudSaveEncryption == 1){
@@ -170,18 +163,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 }
 else if ($_SERVER['REQUEST_METHOD'] == 'GET')
 {
-	if (array_key_exists('k', $_GET))
+	if (!empty($_GET['k']) && !empty(trim($_GET['k'])))
 	{
-		$query = $db->prepare("SELECT accountID FROM accounts WHERE passwordResetKey=:prk");
+		$query = $db->prepare("SELECT accountID, userName FROM accounts WHERE passwordResetKey=:prk ORDER BY registerDate ASC");
 		$query->execute([':prk' => $_GET['k']]);
-		
+		$result = $query->fetchAll();
+
 		if ($query->rowCount() == 0)
 		{
 			echo '<p class="nobox">Expired password reset key! <a href="/gdapi/tools/account/resetPassword.php">Request another</a></p>';
 		}
 		else
 		{
-			echo '<form action="/gdapi/tools/account/resetPassword.php" method="post"><input type="password" name="password" placeholder="New Password"><input type="hidden" id="k" name="k" value="' . $_GET['k'] . '"><br><input type="submit" value="Reset"></form>';
+			$accounts = '';
+			$isFirst = true;
+
+			foreach ($result as &$acc) {
+				$checked = ($isFirst) ? 'checked' : '';
+
+				$accounts .= '<input type="radio" name="accountID" id="accountID-' . $acc['accountID'] . '" value="' . $acc['accountID'] . '" required ' . $checked . ' />
+<label for="accountID-' . $acc['accountID'] . '">' . $acc['userName'] . '</label><br />';
+
+				$isFirst = false;
+			}
+
+			echo '<form action="/gdapi/tools/account/resetPassword2.php" method="post">
+Select account to reset: <p> ' . $accounts . ' </p>
+<input type="password" name="password" placeholder="New Password" required> <br />
+<input type="hidden" id="k" name="k" value="' . $_GET['k'] . '"> <br />
+<input type="submit" value="Reset"></form>';
 		}
 	}
 	else
