@@ -6,6 +6,8 @@ include "../lib/connection.php";
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
+require_once "../lib/wordFilter.php";
+
 $gs = new mainLib();
 
 if(!isset($_POST["userName"]) OR !isset($_POST["secret"]) OR !isset($_POST["stars"])
@@ -22,6 +24,10 @@ $demons = ExploitPatch::remove($_POST["demons"]);
 $icon = ExploitPatch::remove($_POST["icon"]);
 $color1 = ExploitPatch::remove($_POST["color1"]);
 $color2 = ExploitPatch::remove($_POST["color2"]);
+
+if (WordFilter::checkBlocked($userName)) {
+	exit("-1");
+}
 
 $gameVersion = !empty($_POST["gameVersion"]) ? ExploitPatch::remove($_POST["gameVersion"]) : 1;
 $binaryVersion = !empty($_POST["binaryVersion"]) ? ExploitPatch::remove($_POST["binaryVersion"]) : 1;

@@ -6,6 +6,7 @@ $mainLib = new mainLib();
 require_once "../lib/GJPCheck.php";
 require_once "../lib/exploitPatch.php";
 require_once "../lib/commands.php";
+require_once "../lib/wordFilter.php";
 
 $userName = !empty($_POST['userName']) ? ExploitPatch::remove($_POST['userName']) : "";
 $gameVersion = !empty($_POST['gameVersion']) ? ExploitPatch::number($_POST['gameVersion']) : 0;
@@ -19,6 +20,10 @@ $register = is_numeric($id);
 $userID = $mainLib->getUserID($id, $userName);
 $uploadDate = time();
 $decodecomment = base64_decode($comment);
+
+if (WordFilter::checkBlocked($decodecomment))
+	exit("-1");
+
 if(Commands::doCommands($id, $decodecomment, $levelID)){
 	exit($gameVersion > 20 ? "temp_0_Command executed successfully!" : "-10");
 }

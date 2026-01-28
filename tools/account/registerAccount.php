@@ -16,6 +16,7 @@ include "../../incl/lib/connection.php";
 require "../../incl/lib/exploitPatch.php";
 require "../../incl/lib/generatePass.php";
 require_once "../../incl/lib/mainLib.php";
+require_once "../../incl/lib/wordFilter.php";
 
 $registerForm = <<<'EOD'
 <form action="registerAccount.php" method="post">
@@ -40,7 +41,10 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 	$repeat_password = ExploitPatch::remove($_POST["repeatpassword"]);
 	$email = ExploitPatch::remove($_POST["email"]);
 	$repeat_email = ExploitPatch::remove($_POST["repeatemail"]);
-	if(strlen($username) < 3){
+
+	if (WordFilter::checkBlocked($username)) {
+		echo "<p>Invalid username.</p>$registerForm";
+	} elseif(strlen($username) < 3){
 		// choose a longer username
 		echo "<p>Username should be more than 3 characters.</p>$registerForm";
 	}elseif(strlen($password) < 6){

@@ -7,6 +7,8 @@ require_once "../lib/exploitPatch.php";
 require_once "../lib/mainLib.php";
 $mainLib = new mainLib();
 require_once "../lib/mainLib.php";
+require_once "../lib/wordFilter.php";
+
 $gs = new mainLib();
 //here im getting all the data
 $gjp2check = $_POST['gjp2'] ?? $_POST['gjp'] ?? '';
@@ -17,6 +19,10 @@ $levelID = ExploitPatch::remove($_POST["levelID"]);
 $levelName = ExploitPatch::charclean($_POST["levelName"]);
 //TODO: move description fixing code to a function
 $levelDesc = ExploitPatch::remove($_POST["levelDesc"]);
+
+if (WordFilter::checkBlocked($levelName)) {
+	exit("-1");
+}
 
 if ($gameVersion >= 20) {
 	// don't allow newer clients to upload levels...
@@ -32,6 +38,10 @@ if($gameVersion < 20){
 	$rawDesc = str_replace('_', '/', $rawDesc);
 	$rawDesc = base64_decode($rawDesc);
 }
+
+if (WordFilter::checkBlocked($rawDesc))
+	exit("-1");
+
 if (strpos($rawDesc, '<c') !== false) {
 	$tags = substr_count($rawDesc, '<c');
 	if ($tags > substr_count($rawDesc, '</c>')) {

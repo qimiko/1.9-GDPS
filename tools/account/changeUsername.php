@@ -13,6 +13,8 @@
 include "../../incl/lib/connection.php";
 require "../../incl/lib/generatePass.php";
 require_once "../../incl/lib/exploitPatch.php";
+require_once "../../incl/lib/wordFilter.php";
+
 //here im getting all the data
 if(!empty($_POST["userName"]) && !empty($_POST["newusr"]) && !empty($_POST["password"])){
 	$userName = ExploitPatch::remove($_POST["userName"]);
@@ -23,6 +25,10 @@ if(!empty($_POST["userName"]) && !empty($_POST["newusr"]) && !empty($_POST["pass
 	if ($pass == 1) {
 		if(strlen($newusr) > 20)
 			exit("Username too long - 20 characters max. <a href='changeUsername.php'>Try again</a>");
+
+		if (WordFilter::checkBlocked($username))
+			exit("Invalid username. <a href='changeUsername.php'>Try again</a>");
+
 		$query = $db->prepare("SELECT count(*) FROM accounts WHERE userName = :newUserName");
 		$query->execute([":newUserName" => $newusr]);
 		if($query->fetchColumn() > 0) exit("<p>Account with this nickname already exists!</p>");

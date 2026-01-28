@@ -4,6 +4,7 @@ include "../incl/lib/connection.php";
 require_once "../incl/lib/exploitPatch.php";
 require "../incl/lib/generatePass.php";
 require_once "../incl/lib/mainLib.php";
+require_once "../incl/lib/wordFilter.php";
 
 if(!isset($preactivateAccounts)){
 	$preactivateAccounts = true;
@@ -18,6 +19,10 @@ if($_POST["userName"] != ""){
 	//checking if username is within the GD length limit
 	if(strlen($userName) > 20)
 		exit("-4");
+
+	if (WordFilter::checkBlocked($username))
+		exit("-1");
+
 	//checking if name is taken
 	$query2 = $db->prepare("SELECT count(*) FROM accounts WHERE userName LIKE :userName");
 	$query2->execute([':userName' => $userName]);

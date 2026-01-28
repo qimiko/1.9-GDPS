@@ -6,6 +6,7 @@ include "../config/security.php";
 include "../incl/lib/connection.php";
 require_once "../incl/lib/exploitPatch.php";
 require_once "../incl/lib/mainLib.php";
+require_once "../incl/lib/wordFilter.php";
 
 $gs = new mainLib();
 $ip = $gs->getIP();
@@ -16,25 +17,30 @@ if(!isset($preactivateAccounts)){
 
 if(isset($_POST['username']) && isset($_POST['password']) && isset($_POST['email']))
 {
-	if (strlen($_POST['username']) < 3 || strlen($_POST['username']) > 20)
-	{
-		exit(json_encode(['success' => false, 'error' => 'username length not 3-20']));
-	}
-	
-	if (strlen($_POST['password']) < 6 || strlen($_POST['password']) > 20)
-	{
-		exit(json_encode(['success' => false, 'error' => 'password length not 6-20']));
-	}
-	
-	if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL))
-	{
-		exit(json_encode(['success' => false, 'error' => 'invalid email']));
-	}
-	
 	//here im getting all the data
 	$userName = ExploitPatch::remove($_POST["username"]);
 	$password = ExploitPatch::remove($_POST["password"]);
 	$email = ExploitPatch::remove($_POST["email"]);
+
+	if ($userName < 3 || $userName > 20)
+	{
+		exit(json_encode(['success' => false, 'error' => 'username length not 3-20']));
+	}
+
+	if (WordFilter::checkBlocked($userName)) {
+		exit(json_encode(['success' => false, 'error' => 'invalid username']));
+	}
+
+	if ($password < 6 || $password > 20)
+	{
+		exit(json_encode(['success' => false, 'error' => 'password length not 6-20']));
+	}
+	
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+	{
+		exit(json_encode(['success' => false, 'error' => 'invalid email']));
+	}
+
 	$secret = "";
 	//checking if name is taken
 	$query2 = $db->prepare("SELECT count(*) FROM accounts WHERE userName LIKE :userName");
