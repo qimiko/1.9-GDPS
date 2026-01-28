@@ -22,6 +22,7 @@ include_once "../../config/email.php";
 require "../../incl/lib/generatePass.php";
 require_once "../../incl/lib/exploitPatch.php";
 include_once "../../incl/lib/defuse-crypto.phar";
+require_once "../../incl/lib/Captcha.php";
 
 // import phpmailer
 require "../../../../../PHPMailer/src/Exception.php";
@@ -33,6 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
 	if (array_key_exists('email', $_POST))
 	{
+		if(!Captcha::validateCaptcha())
+			exit("Invalid captcha response");
+
 		$query = $db->prepare("SELECT email, accountID, userName, passwordResetKey, passwordResetTime FROM accounts WHERE email=:email LIMIT 1");
 		$query->execute([':email' => $_POST['email']]);
 
@@ -196,7 +200,11 @@ Select account to reset: <p> ' . $accounts . ' </p>
 	}
 	else
 	{
-		echo '<p>I hope you remember your email!</p><form action="" method="post"><input type="text" name="email" placeholder="Email"><br><input type="submit" value="Get Reset Email"></form>';
+		echo '<p>I hope you remember your email!</p><form action="" method="post"><input type="text" name="email" placeholder="Email"><br>';
+
+		Captcha::displayCaptcha();
+
+		echo '<input type="submit" value="Get Reset Email"></form>';
 	}
 }
 else

@@ -13,6 +13,12 @@
 
 		<form action="" method="post">
 			<input class="smain" type="text" placeholder="Username" name="u"><br>
+
+			<?php
+				require_once "../../incl/lib/Captcha.php";
+				Captcha::displayCaptcha();
+			?>
+
 			<input class="smain" type="password" placeholder="Password" name="p"><br>
 			<input class="smain" type="submit" value="Go">
 		</form>
@@ -25,6 +31,9 @@ require "../../incl/lib/auth.php";
 
 if (!empty($_POST['u']) AND !empty($_POST['p']))
 {
+	if(!Captcha::validateCaptcha())
+		exit("<p>Invalid captcha response</p>");
+
 	$pass = GeneratePass::isValidUsrname($_POST['u'], $_POST['p']);
 
 	if ($pass)
