@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			$salt = '';
 			$accid = $acc['accountID'];
 			$passhash = password_hash($newpass, PASSWORD_DEFAULT);
-			$query = $db->prepare("UPDATE accounts SET password=:password, salt=:salt WHERE accountID=:accid");	
+			$query = $db->prepare("UPDATE accounts SET password=:password, salt=:salt, legacyAccToken=NULL, legacyAccGJP2=NULL WHERE accountID=:accid");	
 			$query->execute([':password' => $passhash, ':accid' => $accid, ':salt' => $salt]);
 			GeneratePass::assignGJP2($accid, $newpass);
 

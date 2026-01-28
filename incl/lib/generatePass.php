@@ -1,6 +1,17 @@
 <?php
 require_once dirname(__FILE__)."/mainLib.php";
 
+function generateRandomGDPassword() {
+    $characters = ' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < 20; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
+
 class GeneratePass
 {
 	public static function GJP2fromPassword($pass) {
@@ -16,6 +27,17 @@ class GeneratePass
 
 		$query = $db->prepare("UPDATE accounts SET gjp2 = :gjp2 WHERE accountID = :id");
 		$query->execute(["gjp2" => self::GJP2hash($pass), ":id" => $accid]);
+	}
+
+	public static function assignLegacyToken($accid) {
+		$token = generateRandomGDPassword();
+
+		include dirname(__FILE__)."/connection.php";
+
+		$query = $db->prepare("UPDATE accounts SET legacyAccToken = :token, legacyAccGJP2 = :encodedToken WHERE accountID = :id");
+		$query->execute(["token" => $token, "encodedToken" => self::GJP2fromPassword($token), ":id" => $accid]);
+
+		return $token;
 	}
 
 	public static function attemptsFromIP() {
@@ -64,7 +86,7 @@ class GeneratePass
 
 		if(self::tooManyAttemptsFromIP()) return -1;
 
-		$userInfo = $db->prepare("SELECT gjp2, isActive FROM accounts WHERE accountID = :accid");
+		$userInfo = $db->prepare("SELECT gjp2, isActive, legacyAccGJP2 FROM accounts WHERE accountID = :accid");
 		$userInfo->execute([':accid' => $accid]);
 		if($userInfo->rowCount() == 0) return 0;
 
@@ -74,11 +96,15 @@ class GeneratePass
 		if(password_verify($gjp2, $userInfo['gjp2'])) {
 			self::assignModIPs($accid, $gs->getIP());
 			return $userInfo['isActive'] ? 1 : -2;
-		} else {
-			self::logInvalidAttemptFromIP($accid);
-			return 0;
 		}
-		
+
+		if (isset($userinfo['legacyAccGJP2']) && $gjp2 == $userinfo['legacyAccGJP2']) {
+			self::assignModIPs($accid, $gs->getIP());
+			return $userInfo['isActive'] ? 1 : -2;
+		}
+
+		self::logInvalidAttemptFromIP($accid);
+		return 0;
 	}
 
 	public static function isGJP2ValidUsrname($userName, $gjp2) {
@@ -100,7 +126,7 @@ class GeneratePass
 
 		if(self::tooManyAttemptsFromIP()) return -1;
 
-		$query = $db->prepare("SELECT accountID, salt, password, isActive, gjp2 FROM accounts WHERE accountID = :accid");
+		$query = $db->prepare("SELECT accountID, salt, password, isActive, gjp2, legacyAccToken FROM accounts WHERE accountID = :accid");
 		$query->execute([':accid' => $accid]);
 		if($query->rowCount() == 0) return 0;
 		
@@ -109,12 +135,20 @@ class GeneratePass
 			if(!$result["gjp2"]) self::assignGJP2($accid, $pass);
 			self::assignModIPs($accid, $gs->getIP());
 			return $result['isActive'] ? 1 : -2;
-		} else {
-			// Code to validate password hashes created prior to March 2017 has been removed.
-			self::logInvalidAttemptFromIP($accid);
-			return 0;
 		}
 
+		/*
+		// TODO: enable this once account management rewrite is complete
+		if (isset($userinfo['legacyAccToken']) && $pass == $userinfo['legacyAccToken']) {
+			// no gjp2 in this case
+			self::assignModIPs($accid, $gs->getIP());
+			return $result['isActive'] ? 1 : -2;
+		}
+		*/
+
+		// Code to validate password hashes created prior to March 2017 has been removed.
+		self::logInvalidAttemptFromIP($accid);
+		return 0;
 	}
 	public static function isValidUsrname($userName, $pass){
 		include dirname(__FILE__)."/connection.php";

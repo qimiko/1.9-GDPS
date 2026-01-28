@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `mS` int(11) NOT NULL DEFAULT 0,
   `frS` int(11) NOT NULL DEFAULT 0,
   `cS` int(11) NOT NULL DEFAULT 0,
+  `legacyAccToken` varchar(255) DEFAULT NULL,
+  `legacyAccGJP2` varchar(255) DEFAULT NULL,
   `youtubeurl` varchar(255) NOT NULL DEFAULT '',
   `twitter` varchar(255) NOT NULL DEFAULT '',
   `twitch` varchar(255) NOT NULL DEFAULT '',

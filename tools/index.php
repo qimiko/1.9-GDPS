@@ -13,6 +13,7 @@
 				<a href="account/registerAccount.php">Register Account</a>
 				<a href="account/changePassword.php">Change Password</a>
 				<a href="account/changeUsername.php">Change Username</a>
+				<a href="account/enableLegacyAuth.php">Enable 2.2 Login</a>
 				<a href="newSession.php">Make Session</a>
 				<a href="account/resetPassword.php">Forgot Password</a>
 				<a href="account/checkTokens.php">Active Devices</a>
