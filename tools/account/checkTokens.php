@@ -11,23 +11,12 @@
 
 		<h1>View Active Devices</h1>
 
-		<form action="" method="post">
-			<input class="smain" type="text" placeholder="Username" name="u"><br>
-			<input class="smain" type="password" placeholder="Password" name="p"><br>
-
-			<?php
-				require_once "../../incl/lib/Captcha.php";
-				Captcha::displayCaptcha();
-			?>
-
-			<input class="smain" type="submit" value="Go">
-		</form>
-
 <?php
 
 include "../../incl/lib/connection.php";
 require "../../incl/lib/generatePass.php";
 require "../../incl/lib/auth.php";
+require_once "../../incl/lib/Captcha.php";
 
 if (!empty($_POST['u']) AND !empty($_POST['p']))
 {
@@ -75,6 +64,14 @@ if (!empty($_POST['u']) AND !empty($_POST['p']))
 	}
 
 	echo "<p>Successfully logged out device!</p>";
+} else {
+	echo '<form action="" method="post">
+		<input class="smain" type="text" placeholder="Username" name="u"><br />
+		<input class="smain" type="password" placeholder="Password" name="p"><br />';
+
+	Captcha::displayCaptcha();
+
+	echo '<input class="smain" type="submit" value="Go"></form>';
 }
 
 ?>
