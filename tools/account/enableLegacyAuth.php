@@ -31,7 +31,7 @@ if (!empty($_POST['u']) AND !empty($_POST['p']))
 		$accountId = $query->fetchColumn();
 
 		$token = GeneratePass::assignLegacyToken($accountId);
-		echo "<p>Token set! Use this token in place of the password when logging into a 2.2 client.</p> <p> <code>$token</code> </p> <p>Please keep it safe! For your security, you will not be able to view this token upon closing the page.</p>";
+		echo "<p>Token set! Use this token in place of the password when logging into a 2.2 client.</p> <p> <code style='user-select: all;'>$token</code> </p> <p>Please keep it safe. For your security, you will not be able to view this token upon closing the page.</p>";
 	}
 	else
 	{

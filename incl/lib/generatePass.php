@@ -98,7 +98,7 @@ class GeneratePass
 			return $userInfo['isActive'] ? 1 : -2;
 		}
 
-		if (isset($userinfo['legacyAccGJP2']) && $gjp2 == $userinfo['legacyAccGJP2']) {
+		if (isset($userInfo['legacyAccGJP2']) && $gjp2 == $userInfo['legacyAccGJP2']) {
 			self::assignModIPs($accid, $gs->getIP());
 			return $userInfo['isActive'] ? 1 : -2;
 		}
@@ -139,7 +139,7 @@ class GeneratePass
 
 		/*
 		// TODO: enable this once account management rewrite is complete
-		if (isset($userinfo['legacyAccToken']) && $pass == $userinfo['legacyAccToken']) {
+		if (isset($result['legacyAccToken']) && $pass == $result['legacyAccToken']) {
 			// no gjp2 in this case
 			self::assignModIPs($accid, $gs->getIP());
 			return $result['isActive'] ? 1 : -2;
