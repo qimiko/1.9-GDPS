@@ -46,10 +46,10 @@
 			</p>
 			
 			<h2>Other</h2>
-			<p><a href="cron/cron.php">Cron Job</a><a href="cron/fixcps.php">Fix CPs</a><a href="cron/autoban.php">AutoBan</a><a href="cron/deleteInvalidUsersAndSongs.php">Cleanup</a><a href="stats/serverInfo.php">Server Info</a></p>
+			<p><a href="cron/cron.php">Cron Job</a><a href="cron/fixcps.php">Fix Points</a><a href="cron/autoban.php">AutoBan</a><a href="cron/deleteInvalidUsersAndSongs.php">Cleanup</a><a href="stats/serverInfo.php">Server Info</a></p>
 			
 			<h2>Moderation</h2>
-			<p><a href="stats/modActions.php">Mod Actions</a><a href="mod/leaderboardsBan.php">Leaderboards Ban</a><a href="mod/leaderboardsUnban.php">Leaderboards UnBan</a><a href="mod/sendBan.php">Send Ban</a><a href="mod/packCreate.php">Create Map Pack</a><a href="mod/editPack.php">Edit Map Pack</a><a href="mod/manageComments.php">Manage Comments</a><a href="mod/commentBan.php">Comment Ban</a><a href="mod/sharedcp.php">Shared CP</a></p>
+			<p><a href="stats/modActions.php">Mod Actions</a><a href="mod/leaderboardsBan.php">Leaderboards Ban</a><a href="mod/leaderboardsUnban.php">Leaderboards UnBan</a><a href="mod/sendBan.php">Send Ban</a><a href="mod/packCreate.php">Create Map Pack</a><a href="mod/editPack.php">Edit Map Pack</a><a href="mod/manageComments.php">Manage Comments</a><a href="mod/commentBan.php">Comment Ban</a><a href="mod/sharedcp.php">Shared Points</a></p>
 			
 			<h2>Administration</h2>
 			<p><a href="admin/mod.php">Set Mod Status</a><a href="super/admin.php">Set Admin Status</a></p>

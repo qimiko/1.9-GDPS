@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Shared CP</title>
+		<title>Shared Creator Points</title>
 		<?php include "../../../../incl/_style.php"; ?>
 	</head>
 
@@ -9,7 +9,7 @@
 		<?php include "../../../../incl/_nav.php"; ?>
 
 		<div class="smain">
-			<h1>Shared CP</h1>
+			<h1>Shared Creator Points</h1>
 
 			<table><tr><th>Level ID</th><th>Shared Users</th></tr>
 <?php
