@@ -2,7 +2,7 @@
 require_once dirname(__FILE__)."/mainLib.php";
 
 function generateRandomGDPassword() {
-    $characters = ' abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
+    $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
     $charactersLength = strlen($characters);
     $randomString = '';
     for ($i = 0; $i < 20; $i++) {
@@ -30,12 +30,12 @@ class GeneratePass
 	}
 
 	public static function assignLegacyToken($accid) {
-		$token = generateRandomGDPassword();
-
 		include dirname(__FILE__)."/connection.php";
 
-		$query = $db->prepare("UPDATE accounts SET legacyAccToken = :token, legacyAccGJP2 = :encodedToken WHERE accountID = :id");
-		$query->execute(["token" => $token, "encodedToken" => self::GJP2fromPassword($token), ":id" => $accid]);
+		$token = generateRandomGDPassword();
+
+		$query = $db->prepare('UPDATE accounts SET legacyAccToken = :token, legacyAccGJP2 = :encodedToken WHERE accountID = :id');
+		$query->execute(['token' => $token, 'encodedToken' => self::GJP2fromPassword($token), ':id' => $accid]);
 
 		return $token;
 	}
