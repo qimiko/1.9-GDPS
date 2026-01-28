@@ -6,7 +6,7 @@ class WordFilter {
 
 		if ($handle) {
 			while (($line = fgets($handle)) !== false) {
-				if (stripos($sentence, $line) !== false) {
+				if (stripos($sentence, trim($line)) !== false) {
 					return true;
 				}
 			}
