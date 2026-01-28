@@ -5,12 +5,11 @@ function generateRandomGDPassword() {
     $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
     $charactersLength = strlen($characters);
     $randomString = '';
-    for ($i = 0; $i < 20; $i++) {
+    for ($i = 0; $i < 19; $i++) {
         $randomString .= $characters[rand(0, $charactersLength - 1)];
     }
     return $randomString;
 }
-
 
 class GeneratePass
 {
