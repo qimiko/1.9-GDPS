@@ -22,7 +22,6 @@
 			<p>
 				<a href="stats/epicLevels.php">Epic Levels</a>
 				<a href="levelReupload.php">Level Reupload</a>
-				<a href="levelToGD.php">Level To GD</a>
 				<a href="stats/myUnlistedLevels.php">Unlisted Levels</a>
 				<a href="stats/mapPacks.php">Map Packs</a>
 				<a href="stats/reportedLevels.php">Reported Levels</a>
@@ -38,7 +37,12 @@
 			</p>
 			
 			<h2>Users</h2>
-			<p><a href="stats/getUserInfo.php">Search Users</a><a href="stats/starGains.php">Star Gains</a><a href="stats/top24h.php">Top 24h</a><a href="stats/topWeek.php">Top Week</a><a href="stats/noLogIn.php">Unused Accounts</a></p>
+			<p>
+				<a href="stats/getUserInfo.php">Search Users</a>
+				<a href="stats/starGains.php">Star Gains</a>
+				<a href="stats/top24h.php">Top 24h</a>
+				<a href="stats/topWeek.php">Top Week</a>
+			</p>
 			
 			<h2>Other</h2>
 			<p><a href="cron/cron.php">Cron Job</a><a href="cron/fixcps.php">Fix CPs</a><a href="cron/autoban.php">AutoBan</a><a href="cron/deleteInvalidUsersAndSongs.php">Cleanup</a><a href="stats/serverInfo.php">Server Info</a></p>

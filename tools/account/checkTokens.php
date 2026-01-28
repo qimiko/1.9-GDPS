@@ -13,13 +13,13 @@
 
 		<form action="" method="post">
 			<input class="smain" type="text" placeholder="Username" name="u"><br>
+			<input class="smain" type="password" placeholder="Password" name="p"><br>
 
 			<?php
 				require_once "../../incl/lib/Captcha.php";
 				Captcha::displayCaptcha();
 			?>
 
-			<input class="smain" type="password" placeholder="Password" name="p"><br>
 			<input class="smain" type="submit" value="Go">
 		</form>
 
