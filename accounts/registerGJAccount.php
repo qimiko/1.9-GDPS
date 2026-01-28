@@ -20,7 +20,7 @@ if($_POST["userName"] != ""){
 	if(strlen($userName) > 20)
 		exit("-4");
 
-	if (WordFilter::checkBlocked($username))
+	if (WordFilter::checkBlocked($userName))
 		exit("-1");
 
 	//checking if name is taken
