@@ -121,7 +121,7 @@ class GeneratePass
 		include dirname(__FILE__)."/connection.php";
 		$gs = new mainLib();
 
-		if(self::tooManyAttemptsFromAcc($accd)) return -1;
+		if(self::tooManyAttemptsFromAcc($accid)) return -1;
 
 		$query = $db->prepare("SELECT accountID, salt, password, isActive, gjp2, legacyAccToken FROM accounts WHERE accountID = :accid");
 		$query->execute([':accid' => $accid]);
