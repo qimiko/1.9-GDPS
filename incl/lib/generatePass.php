@@ -44,8 +44,8 @@ class GeneratePass
 		$gs = new mainLib();
 		$ip = $gs->getIP();
 		$newtime = time() - (60*60);
-		$query6 = $db->prepare("SELECT count(*) FROM actions WHERE type = '6' AND timestamp > :time AND value2 = :ip");
-		$query6->execute([':time' => $newtime, ':ip' => $ip]);
+		$query6 = $db->prepare("SELECT count(*) FROM actions WHERE type = '6' AND timestamp > :time");
+		$query6->execute([':time' => $newtime]);
 		return $query6->fetchColumn();
 	}
 
