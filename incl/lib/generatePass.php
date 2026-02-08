@@ -39,18 +39,16 @@ class GeneratePass
 		return $token;
 	}
 
-	public static function attemptsFromIP() {
+	public static function attemptsFromAcc($accID) {
 		include dirname(__FILE__)."/connection.php";
-		$gs = new mainLib();
-		$ip = $gs->getIP();
 		$newtime = time() - (60*60);
-		$query6 = $db->prepare("SELECT count(*) FROM actions WHERE type = '6' AND timestamp > :time");
-		$query6->execute([':time' => $newtime]);
+		$query6 = $db->prepare("SELECT count(*) FROM actions WHERE type = '6' AND timestamp > :time AND value=:accID");
+		$query6->execute([':time' => $newtime, ':accID' => $accID]);
 		return $query6->fetchColumn();
 	}
 
-	public static function tooManyAttemptsFromIP() {
-		return self::attemptsFromIP() > 7;
+	public static function tooManyAttemptsFromAcc($accID) {
+		return self::attemptsFromAcc($accID) > 7;
 	}
 
 	public static function logInvalidAttemptFromIP($accid) {
@@ -83,7 +81,7 @@ class GeneratePass
 		include dirname(__FILE__)."/connection.php";
 		$gs = new mainLib();
 
-		if(self::tooManyAttemptsFromIP()) return -1;
+		if(self::tooManyAttemptsFromAcc($accid)) return -1;
 
 		$userInfo = $db->prepare("SELECT gjp2, isActive, legacyAccGJP2 FROM accounts WHERE accountID = :accid");
 		$userInfo->execute([':accid' => $accid]);
@@ -123,7 +121,7 @@ class GeneratePass
 		include dirname(__FILE__)."/connection.php";
 		$gs = new mainLib();
 
-		if(self::tooManyAttemptsFromIP()) return -1;
+		if(self::tooManyAttemptsFromAcc($accd)) return -1;
 
 		$query = $db->prepare("SELECT accountID, salt, password, isActive, gjp2, legacyAccToken FROM accounts WHERE accountID = :accid");
 		$query->execute([':accid' => $accid]);
