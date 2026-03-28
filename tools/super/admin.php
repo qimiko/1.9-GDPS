@@ -31,7 +31,7 @@ if (!empty($_POST['u']) AND !empty($_POST['p']) AND !empty($_POST['id']))
 {
 	$pass = GeneratePass::isValidUsrname($_POST['u'], $_POST['p']);
 	
-	$q = $db->prepare("SELECT isHeadAdmin FROM accounts WHERE userName = :un AND (accountID = 71 OR accountID = 47360943)");
+	$q = $db->prepare("SELECT isHeadAdmin FROM accounts WHERE userName = :un AND (accountID = 71 OR accountID = 47372533)");
 	$q->execute([':un' => $_POST['u']]);
 	$result = $q->fetch()[0];
 
