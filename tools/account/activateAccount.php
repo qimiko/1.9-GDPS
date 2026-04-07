@@ -1,3 +1,15 @@
+<html>
+        <head>
+                <title>Activate Account - 1.9 GDPS</title>
+                <?php include "../../../../incl/_style.php"; ?>
+        </head>
+
+        <body>
+                <?php include "../../../../incl/_nav.php"; ?>
+
+                <div class="smain">
+                        <h1>Activate Account</h1>
+
 <?php
 include "../../incl/lib/connection.php";
 require "../../incl/lib/generatePass.php";
@@ -13,12 +25,12 @@ if(!empty($_POST["userName"]) && !empty($_POST["password"])){
 	if ($pass == -2){
 		$query = $db->prepare("UPDATE accounts SET isActive = 1 WHERE userName LIKE :userName");
 		$query->execute(['userName' => $userName]);
-		echo "Account has been succesfully activated.";
+		echo "Account has been successfully activated.";
 	}
 	elseif ($pass == 1) {
 		echo "Account is already activated.";
 	}else{
-		echo "Invalid password or nonexistant account. <a href='activateAccount.php'>Try again</a>";
+		echo "Invalid password or nonexistent account. <a href='activateAccount.php'>Try again</a>";
 	}
 }else{
 	echo '<form method="post">
@@ -28,3 +40,6 @@ if(!empty($_POST["userName"]) && !empty($_POST["password"])){
 	echo '<input type="submit" value="Activate"></form>';
 }
 ?>
+		</div>
+	</body>
+</html>

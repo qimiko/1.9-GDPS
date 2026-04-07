@@ -11,6 +11,7 @@
 			<h2>My Account</h2>
 			<p>
 				<a href="account/registerAccount.php">Register Account</a>
+				<a href="account/activateAccount.php">Activate Account</a>
 				<a href="account/changePassword.php">Change Password</a>
 				<a href="account/changeUsername.php">Change Username</a>
 				<a href="account/enableLegacyAuth.php">Enable 2.2 Login</a>

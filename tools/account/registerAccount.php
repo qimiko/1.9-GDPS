@@ -13,6 +13,7 @@
 <?php
 include "../../config/security.php";
 include "../../incl/lib/connection.php";
+require "../../incl/lib/Captcha.php";
 require "../../incl/lib/exploitPatch.php";
 require "../../incl/lib/generatePass.php";
 require_once "../../incl/lib/mainLib.php";
@@ -29,6 +30,20 @@ $registerForm = <<<'EOD'
 </form>
 EOD;
 
+function displayRegisterForm() {
+	echo <<<'EOD'
+<form action="registerAccount.php" method="post">
+        Username: <input type="text" name="username" maxlength=15 /> <br />
+        Password: <input type="password" name="password" maxlength=20 /> <br/>
+        Repeat Password: <input type="password" name="repeatpassword" maxlength=20 /> <br />
+        Email: <input type="email" name="email" maxlength=50 /> <br />
+        Repeat Email: <input type="email" name="repeatemail" maxlength=50 /> <br />
+EOD;
+	Captcha::displayCaptcha();
+
+	echo '<input type="submit" value="Register" /></form>';
+}
+
 if(!isset($preactivateAccounts)){
 	$preactivateAccounts = true;
 }
@@ -42,14 +57,20 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 	$email = ExploitPatch::remove($_POST["email"]);
 	$repeat_email = ExploitPatch::remove($_POST["repeatemail"]);
 
-	if (WordFilter::checkBlocked($username)) {
-		echo "<p>Invalid username.</p>$registerForm";
+	if(!Captcha::validateCaptcha()) {
+		echo "<p>Invalid captcha response.</p>";
+		displayRegisterForm();
+	} elseif (WordFilter::checkBlocked($username)) {
+		echo "<p>Invalid username.</p>";
+		displayRegisterForm();
 	} elseif(strlen($username) < 3){
 		// choose a longer username
-		echo "<p>Username should be more than 3 characters.</p>$registerForm";
+		echo "<p>Username should be more than 3 characters.</p>";
+		displayRegisterForm();
 	}elseif(strlen($password) < 6){
 		// just why did you want to give a short password? do you wanna be hacked?
-		echo "<p>Password should be more than 6 characters.</p>$registerForm";
+		echo "<p>Password should be more than 6 characters.</p>";
+		displayRegisterForm();
 	}else{
 		// this checks if there is another account with the same username as your input
 		$query = $db->prepare("SELECT count(*) FROM accounts WHERE userName LIKE :userName");
@@ -57,14 +78,17 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 		$registred_users = $query->fetchColumn();
 		if($registred_users > 0){
 			// why did you want to make a new account with the same username as someone else's
-			echo "<p>Username already taken.</p>$registerForm";
+			echo "<p>Username already taken.</p>";
+			displayRegisterForm();
 		}else{
 			if($password != $repeat_password){
 				// this is when the passwords do not match
-				echo "<p>Passwords do not match.</p>$registerForm";
+				echo "<p>Passwords do not match.</p>";
+				displayRegisterForm();
 			}elseif($email != $repeat_email){
 				// this is when the emails dont match
-				echo "<p>Emails do not match.</p>$registerForm";
+				echo "<p>Emails do not match.</p>";
+				displayRegisterForm();
 			}else{
 				$gs = new mainLib();
 				$ip = $gs->getIP();
@@ -73,15 +97,16 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 				$ratelimit1 = $query3->fetchColumn();
 
 				if ($ratelimit1 > 0) {
-					echo "<p>Ratelimit reached.</p>$registerForm";
+					echo "<p>Ratelimit reached.</p>";
+					displayRegisterForm();
 				} else {
 					// hashing your password and registering your account
 					$hashpass = password_hash($password, PASSWORD_DEFAULT);
 					$query2 = $db->prepare("INSERT INTO accounts (userName, password, email, registerDate, isActive, gjp2, ip)
 					VALUES (:userName, :password, :email, :time, :isActive, :gjp2, :ip)");
-					$query2->execute([':userName' => $username, ':password' => $hashpass, ':email' => $email,':time' => time(), ':isActive' => $preactivateAccounts ? 1 : 0, ':gjp2' => GeneratePass::GJP2hash($password), ':ip' => $ip]);
+					$query2->execute([':userName' => $username, ':password' => $hashpass, ':email' => $email,':time' => time(), ':isActive' => 1, ':gjp2' => GeneratePass::GJP2hash($password), ':ip' => $ip]);
 					// there you go, you are registered.
-					$activationInfo = $preactivateAccounts ? "No e-mail verification required, you can login." : "<a href='activateAccount.php'>Click here to activate it.</a>";
+					$activationInfo = "No e-mail verification required, you can login.";
 					echo "<p>Account registered. ${activationInfo}</p> <a href='..'>Go back to tools</a>";
 				}
 			}
@@ -89,7 +114,7 @@ if(!empty($_POST["username"]) AND !empty($_POST["email"]) AND !empty($_POST["rep
 	}
 }else{
 	// this is given when we dont have an input
-	echo $registerForm;
+	displayRegisterForm();
 }
 ?>
 		</div>
