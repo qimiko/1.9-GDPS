@@ -50,7 +50,7 @@ class GJPCheck {
 	 * @return     The account id
 	 */
 	public static function getAccountIDOrDie(){
-		require_once "../lib/exploitPatch.php";
+		require_once dirname(__FILE__)."/exploitPatch.php";
 		require_once dirname(__FILE__)."/sessions.php";
 		require_once dirname(__FILE__)."/auth.php";
 

@@ -20,7 +20,7 @@ $id = $query->fetchColumn();
 
 $pass = 0;
 if(!empty($_POST["password"])) $pass = GeneratePass::isValidUsrname($userName, $_POST["password"]);
-elseif(!empty($_POST["gjp2"])) $pass = GeneratePass::isGJP2ValidUsrname($userName, $_POST["gjp2"]);
+elseif(!empty($_POST["gjp2"])) $pass = GeneratePass::isGJP2ValidUsrname($userName, $_POST["gjp2"], false);
 if ($pass == 1) { //success
 	//userID
 	$query2 = $db->prepare("SELECT userID FROM users WHERE extID = :id");

@@ -77,7 +77,7 @@ class GeneratePass
 		}
 	}
 
-	public static function isGJP2Valid($accid, $gjp2) {
+	public static function isGJP2Valid($accid, $gjp2, $allowPass = true) {
 		include dirname(__FILE__)."/connection.php";
 		$gs = new mainLib();
 
@@ -91,8 +91,12 @@ class GeneratePass
 		if(!($userInfo['gjp2'])) return -2;
 
 		if(password_verify($gjp2, $userInfo['gjp2'])) {
-			self::assignModIPs($accid, $gs->getIP());
-			return $userInfo['isActive'] ? 1 : -2;
+			if ($allowPass) {
+				self::assignModIPs($accid, $gs->getIP());
+				return $userInfo['isActive'] ? 1 : -2;
+			} else {
+				return -2;
+			}
 		}
 
 		if (isset($userInfo['legacyAccGJP2']) && $gjp2 == $userInfo['legacyAccGJP2']) {
@@ -104,7 +108,7 @@ class GeneratePass
 		return 0;
 	}
 
-	public static function isGJP2ValidUsrname($userName, $gjp2) {
+	public static function isGJP2ValidUsrname($userName, $gjp2, $allowPass = true) {
 		include dirname(__FILE__)."/connection.php";
 		$query = $db->prepare("SELECT accountID FROM accounts WHERE userName LIKE :userName");
 		$query->execute([':userName' => $userName]);
@@ -113,8 +117,7 @@ class GeneratePass
 		}
 		$result = $query->fetch();
 		$accID = $result["accountID"];
-		return self::isGJP2Valid($accID, $gjp2);
-		
+		return self::isGJP2Valid($accID, $gjp2, $allowPass);
 	}
 
 	public static function isValid($accid, $pass) {
