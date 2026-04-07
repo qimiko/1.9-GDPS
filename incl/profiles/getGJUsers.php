@@ -6,7 +6,7 @@ $str = ExploitPatch::remove($_POST["str"]);
 $page = !empty($_POST["page"]) ? (int)ExploitPatch::number($_POST["page"]) : 0;
 $userstring = "";
 $usrpagea = $page*10;
-$query = "SELECT userName, userID, coins, userCoins, icon, color1, color2, color3, iconType, special, extID, stars, creatorPoints, demons, diamonds, moons FROM users WHERE userID = :str OR userName LIKE CONCAT('%', :str, '%') ORDER BY stars DESC LIMIT 10 OFFSET $usrpagea";
+$query = "SELECT userName, userID, coins, userCoins, icon, color1, color2, color3, iconType, special, extID, stars, creatorPoints, demons, diamonds, moons FROM users WHERE userID = :str OR userName LIKE CONCAT('%', :str, '%') ORDER BY (LOWER(userName) = LOWER(:str)) DESC, stars DESC LIMIT 10 OFFSET $usrpagea";
 $query = $db->prepare($query);
 $query->execute([':str' => $str]);
 $result = $query->fetchAll();
